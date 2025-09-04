@@ -421,7 +421,7 @@ function initCreativeAnimations() {
         switch(platform) {
             case 'github': hoverColor = '#333'; break;
             case 'linkedin': hoverColor = '#0077b5'; break;
-            case 'twitter': hoverColor = '#1da1f2'; break;
+            case 'telegram': hoverColor = '#1da1f2'; break;
             case 'dribbble': hoverColor = '#ea4c89'; break;
             default: hoverColor = 'var(--accent-primary)';
         }
