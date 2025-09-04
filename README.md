@@ -19,47 +19,11 @@ A sophisticated, museum-inspired portfolio template crafted for the **GFG Patna 
 - **Contact Form**: Built-in validation with professional feedback
 - **SEO Optimized**: Semantic HTML with proper meta tags
 
-## 🚀 Quick Start
-
-### Step 1: Give it a Star ⭐
-If you find this template useful, please give it a star! It helps others discover this project.
-
-### Step 2: Fork the Repository
-1. Click the **Fork** button at the top right of this repository
-2. This creates a copy in your GitHub account
-
-### Step 3: Clone Your Fork
-```bash
-# Replace 'your-username' with your actual GitHub username
-git clone https://github.com/your-username/museum-portfolio-template.git
-
-# Navigate to the project folder
-cd museum-portfolio-template
 ```
 
 ### Step 4: Customize Your Portfolio
 Open the files in your favorite code editor and customize:
 
-#### `index.html` - Update Your Information:
-```html
-<!-- Change Rudra Singh-->
-<h1 class="name-main">Your Name</h1>
-
-<!-- Update your role -->
-<span class="role-main" id="roleText">Your Title</span>
-
-<!-- Add your description -->
-<p class="hero-description">Your personalized description...</p>
-
-<!-- Update contact information -->
-<p>ashutoshgautamformal@gmail.com</p>
-<p>+91 12345 67890</p>
-<p>Your City, State, Country</p>
-
-<!-- Add your social links -->
-<a href="https://github.com/yourusername" class="social-link" data-platform="github">
-<a href="https://linkedin.com/in/yourusername" class="social-link" data-platform="linkedin">
-```
 
 #### `styles.css` - Customize Colors:
 ```css
@@ -70,47 +34,6 @@ Open the files in your favorite code editor and customize:
     --accent-tertiary: #your-color;
 }
 ```
-
-#### Add Your Projects:
-Replace the placeholder projects with your own work, update images, descriptions, and tech stacks.
-
-#### Add Your Skills:
-Update the skills section with your technologies and adjust the progress percentages.
-
-### Step 5: Test Locally
-```bash
-# Use Live Server in VS Code, or any local server
-# Don't open index.html directly in browser - use a server!
-
-# Alternative: Python simple server
-python -m http.server 8000
-
-# Alternative: Node.js serve
-npx serve .
-```
-
-### Step 6: Deploy to Netlify
-
-#### Option A: Drag & Drop
-1. Go to [Netlify](https://netlify.com)
-2. Drag your project folder to the deploy area
-3. Your site is live!
-
-#### Option B: Git Integration
-1. Push your changes to GitHub:
-```bash
-git add .
-git commit -m "Customize portfolio with my information"
-git push origin main
-```
-2. Connect your GitHub repo to Netlify
-3. Enable auto-deploy
-
-### Step 7: Custom Domain (Optional)
-1. Buy a domain from any provider
-2. In Netlify, go to Domain Settings
-3. Add your custom domain
-4. Update DNS records as instructed
 
 ## 📁 File Structure
 
@@ -202,7 +125,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 👨‍💻 Created By
 
-**Ashutosh Gautam** for **GFG Patna Workshop**
+**Rudra Pratap Singh** at **GFG Patna Workshop** With help of **AshutoshGautams**
 
 - GitHub: [@ashutoshgautams](https://github.com/ashutoshgautams)
 - Workshop: GeeksforGeeks Patna Chapter
