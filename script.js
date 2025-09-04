@@ -506,4 +506,6 @@ console.log('%c💼 Crafted at GFG Patna Workshop',
     'color: #7c8471; font-size: 12px;');
 console.log('%c🎨 Professional • Elegant • Unique', 
     'color: #c19a6b; font-size: 12px; font-weight: 500;');
+
+    
     
