@@ -1,5 +1,7 @@
+# robots.txt for https://www.rudrasingh.dev
 User-agent: *
 Allow: /
 
+
+# Canonical sitemap
 Sitemap: https://www.rudrasingh.dev/sitemap.xml
-Sitemap: https://rudrasingh.dev/sitemap.xml
