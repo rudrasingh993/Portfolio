@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize all functionality
     initTheme();
     initNavigation();
+    initFluidIntro();
     initScrollEffects();
     initTypingAnimation();
     initSkillBars();
@@ -10,6 +11,70 @@ document.addEventListener('DOMContentLoaded', function() {
     initSmoothScrolling();
     initCreativeAnimations();
 });
+
+// Fluid Intro Interactive Features
+function initFluidIntro() {
+    const fluidSection = document.getElementById('fluid-intro');
+    const fluidLetter = document.getElementById('fluidLetter');
+    const navbar = document.getElementById('navbar');
+    const scrollIndicator = document.getElementById('scrollIndicator');
+    
+    if (!fluidSection || !fluidLetter) return;
+    
+    // Scroll indicator click handler - scroll to next section
+    if (scrollIndicator) {
+        scrollIndicator.addEventListener('click', () => {
+            const homeSection = document.getElementById('home');
+            if (homeSection) {
+                homeSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    }
+    
+    // Interactive R text distortion effect
+    let isDragging = false;
+    let dragStartX = 0, dragStartY = 0;
+    
+    fluidSection.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+    });
+    
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        fluidLetter.style.transform = '';
+    });
+    
+    fluidSection.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            const deltaX = (e.clientX - dragStartX) * 0.1;
+            const deltaY = (e.clientY - dragStartY) * 0.1;
+            const skewX = Math.max(-30, Math.min(30, deltaX));
+            const skewY = Math.max(-30, Math.min(30, deltaY));
+            
+            fluidLetter.style.transform = `
+                skewX(${skewX}deg) 
+                skewY(${-skewY}deg) 
+                scale(${1 + Math.abs(deltaX) * 0.002})
+            `;
+        }
+    });
+    
+    // Navbar transparency control
+    if (navbar) {
+        window.addEventListener('scroll', () => {
+            const fluidHeight = fluidSection.offsetHeight;
+            const scrollPos = window.scrollY;
+            
+            if (scrollPos > fluidHeight - 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    }
+}
 
 // Enhanced Theme Toggle with Smooth Transitions
 function initTheme() {
