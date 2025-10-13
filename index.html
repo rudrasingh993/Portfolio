@@ -50,27 +50,24 @@
     <!-- Structured data for search engines: describes the person and portfolio for better SEO -->
     <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Rudra Pratap Singh",
-  "url": "https://rudrasingh.dev",
-  "image": "https://rudrasingh.dev/profilephoto.png",
-  "jobTitle": "Aspiring AI & ML Engineer",
-  "sameAs": [
+"@context": "https://schema.org",
+"@type": "Person",
+"name": "Rudra Pratap Singh",
+"url": "https://www.rudrasingh.dev",
+"image": "https://www.rudrasingh.dev/profilephoto.png",
+"jobTitle": "Aspiring AI & ML Engineer",
+"sameAs": [
     "https://www.linkedin.com/in/rudrapratapsingh99/",
     "https://github.com/rudrasingh993"
-  ]
+]
 }
 </script>
-
 <!-- End of JSON-LD structured data -->
-
 </head>
-<div class="creator-brand">
-    <div class="brand-marquee">Portfolio Created by Rudra Pratap Singh          </div>
-</div>
 <body>
-   <!-- Elegant Paper Texture -->
+
+
+    <!-- Elegant Paper Texture -->
     <div class="paper-texture"></div>
     
     <!-- Sophisticated Background Elements -->
@@ -134,6 +131,18 @@
         </div>
     </nav>
 
+    <!-- Fluid Animation Intro Section -->
+    <section id="fluid-intro" class="fluid-intro-section">
+        <canvas id="fluid-canvas"></canvas>
+        <div class="fluid-overlay">
+            <h1 class="fluid-letter" id="fluidLetter">R</h1>
+        </div>
+        <div class="scroll-indicator" id="scrollIndicator">
+            <span class="scroll-indicator-text">Scroll</span>
+            <div class="scroll-indicator-arrow"></div>
+        </div>
+    </section>
+
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content">
@@ -159,7 +168,7 @@
                 <p class="hero-description">
                     <span class="description-highlight">Building Digital Spaces</span> that feel friendly,
                     look nice, and work without problems.
-                     Every pixel counts,<br> every action speaks.
+                    Every pixel counts,<br> every action speaks.
                 </p>
                 <div class="hero-buttons">
                     <a href="#projects" class="btn btn-primary">
@@ -179,10 +188,10 @@
                         <a href="https://www.linkedin.com/in/rudrapratapsingh99/" class="social-link" data-platform="linkedin" aria-label="LinkedIn — Rudra Pratap Singh">
                             <i class="fab fa-linkedin"></i>
                         </a>
-                        <a href="https://t.me/rudrasingh876" class="social-link" data-platform="telegram">
-                            <i class="fab fa-telegram"></i>
+                        <a href="https://t.me/rudrasingh876" class="social-link" data-platform="telegram" aria-label="Telegram — Rudra Pratap Singh">
+                            <i class="fab fa-telegram" aria-hidden="true"></i>
                         </a>
-                        <a href="#" class="social-link" data-platform="dribbble">
+                        <a href="#" class="social-link" data-platform="dribbble" aria-label="Dribbble — Rudra Pratap Singh">
                             <i class="fab fa-dribbble"></i>
                         </a>
                     </div>
@@ -197,7 +206,7 @@
                         <div class="frame-corner br"></div>
                         <div class="profile-image-container">
                             <img src="profilephoto.png" alt="Rudra Pratap Singh Portfolio Image" class="profile-image">
-                              </div>
+                            </div>
                     </div>
                     <!-- <div class="profile-quote-bubble">
                         <div class="quote-text">"Design is thinking made visual"</div>
@@ -354,7 +363,7 @@
                     </div>
                 </div>
 
-               <!-- <div class="project-card fade-in">
+            <!-- <div class="project-card fade-in">
                     <div class="project-image">
                         <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=500&h=300&fit=crop" alt="Task Management App">
                         <div class="project-overlay">
@@ -622,13 +631,26 @@
         </div>
     </footer>
 
+    <script>
+        window.ga = window.ga || function() {};
+    </script>
+    <script src="dat.gui.min.js"></script>
+    <script src="script2.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const guiContainer = document.querySelector('.dg.main');
+            if (guiContainer) {
+                guiContainer.style.display = 'none';
+            }
+        });
+    </script>
     <script src="script.js"></script>
     <script>
-  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script>
-  window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/speed-insights/script.js"></script>
 </body>
