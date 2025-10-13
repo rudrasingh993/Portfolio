@@ -1,7 +1,27 @@
 <!DOCTYPE html>
-<html>
-     <script type="text/javascript" src="dat.gui.min.js"></script>
-        <style>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fluid Animation — Rudra Singh Portfolio</title>
+    <meta name="description" content="Interactive fluid animation demo from Rudra Singh's portfolio. Click or drag to interact with the fluid canvas.">
+    <link rel="canonical" href="https://www.rudrasingh.dev/FLUID.html">
+
+    <!-- Open Graph / Social -->
+    <meta property="og:title" content="Fluid Animation — Rudra Singh Portfolio">
+    <meta property="og:description" content="Interactive fluid animation demo from Rudra Singh's portfolio. Click or drag to interact with the fluid canvas.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.rudrasingh.dev/FLUID.html">
+    <meta property="og:image" content="https://www.rudrasingh.dev/og-image-1200x630.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Fluid Animation — Rudra Singh Portfolio">
+    <meta name="twitter:description" content="Interactive fluid animation demo from Rudra Singh's portfolio.">
+    <meta name="twitter:image" content="https://www.rudrasingh.dev/og-image-1200x630.png">
+
+    <!-- Minimal CSS required for the demo (kept inline for portability) -->
+    <style>
             @font-face {
                 font-family: 'iconfont';
                 src: url('iconfont.ttf') format('truetype');
@@ -149,30 +169,41 @@
                     opacity: 1;
                 }
             }
-        </style>
-        <script>
+    </style>
+    <script>
             window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
             ga('create', 'UA-105392568-1', 'auto');
             ga('send', 'pageview');
         </script>
-       
-    </head>
-    <body>
-        <canvas></canvas>
 
-        <!-- Mother of God, pls forgive me -->
-        <div class="promo">
-            <div class="promo-middle">
-                <div class="promo-content">
-                    <div class="promo-header">
-                        <span class="promo-close">&times;</span>
-                    </div>
-                    <div class="promo-body">
-                    </div>
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CreativeWork",
+      "name": "Fluid Animation Demo",
+      "description": "Interactive fluid animation demo by Rudra Singh.",
+      "url": "https://www.rudrasingh.dev/FLUID.html"
+    }
+    </script>
+</head>
+<body>
+    <canvas id="fluidCanvas" aria-label="Interactive fluid animation canvas"></canvas>
+
+    <!-- Promo overlay (kept hidden by default) -->
+    <div class="promo" aria-hidden="true">
+        <div class="promo-middle">
+            <div class="promo-content">
+                <div class="promo-header">
+                    <button class="promo-close" aria-label="Close">&times;</button>
                 </div>
+                <div class="promo-body"></div>
             </div>
         </div>
+    </div>
 
-        <script src="./script2.js"></script>
-    </body>
+    <!-- Scripts: keep dat.gui and the demo scripts at the end for performance -->
+    <script type="text/javascript" src="dat.gui.min.js"></script>
+    <script src="./script2.js"></script>
+</body>
 </html>
