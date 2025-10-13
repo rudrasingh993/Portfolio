@@ -117,10 +117,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 👨‍💻 Created By
 
-**Rudra Pratap Singh** at **GFG Patna Workshop** With help of **AshutoshGautams**
-
-- GitHub: [@ashutoshgautams](https://github.com/ashutoshgautams)
-- Workshop: GeeksforGeeks Patna Chapter
+**Rudra Pratap Singh** 
 
 ## 🙏 Acknowledgments
 

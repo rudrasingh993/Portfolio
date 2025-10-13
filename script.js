@@ -500,12 +500,6 @@ resizeObserver.observe(document.documentElement);
 // Console Branding
 console.log('%c🏛️ Welcome to my  Portfolio!', 
     'color: #8b6f47; font-size: 24px; font-weight: 600; font-family: "Playfair Display", serif;');
-console.log('%c✨ Inspired by Harvey.ai aesthetics and Louvre sophistication', 
-    'color: #6b5b73; font-size: 14px; font-style: italic;');
-console.log('%c💼 Crafted at GFG Patna Workshop', 
-    'color: #7c8471; font-size: 12px;');
-console.log('%c🎨 Professional • Elegant • Unique', 
-    'color: #c19a6b; font-size: 12px; font-weight: 500;');
 
     
     

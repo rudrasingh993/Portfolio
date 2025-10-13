@@ -16,7 +16,7 @@
     opacity: 0.8;
 }
 .brand-marquee {
-    animation: scroll-left 25s linear infinite;
+    animation: scroll-left 20s linear infinite;
     white-space: nowrap;
     font-weight: 500;
 }
@@ -25,9 +25,9 @@
     100% { transform: translateX(-100%); }
 }
 
-/* Museum-Inspired Color Palette */
+
 :root {
-    /* Light Theme - Museum Whites & Warm Tones */
+    /* Light Theme - Whites & Warm Tones */
     --bg-primary: #fdfcfb;
     --bg-secondary: #f9f7f4;
     --bg-accent: #f4f1eb;
@@ -39,7 +39,7 @@
     --text-muted: #7a7a7a;
     --text-light: #a0a0a0;
     
-    /* Museum-Inspired Accents */
+  
     --accent-primary: #8b6f47;     /* Warm Bronze */
     --accent-secondary: #6b5b73;   /* Muted Aubergine */
     --accent-tertiary: #7c8471;    /* Sage Green */
@@ -84,7 +84,7 @@
     --border-radius-lg: 4px;
 }
 
-/* Dark Theme - Sophisticated Night Museum */
+/* Dark Theme - Sophisticated  Museum */
 [data-theme="dark"] {
     --bg-primary: #0f0f0f;
     --bg-secondary: #1a1a1a;
