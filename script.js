@@ -63,16 +63,42 @@ function initFluidIntro() {
     
     // Navbar transparency control
     if (navbar) {
-        window.addEventListener('scroll', () => {
-            const fluidHeight = fluidSection.offsetHeight;
-            const scrollPos = window.scrollY;
-            
-            if (scrollPos > fluidHeight - 100) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
+        // Use IntersectionObserver to toggle transparency
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navbar.classList.add('transparent');
+                        navbar.classList.remove('scrolled');
+                    } else {
+                        navbar.classList.remove('transparent');
+                        // Check scroll position for scrolled class
+                        if (window.scrollY > 50) {
+                            navbar.classList.add('scrolled');
+                        }
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            observer.observe(fluidSection);
+        } else {
+            // Fallback: use scroll position
+            window.addEventListener('scroll', () => {
+                const fluidHeight = fluidSection.offsetHeight;
+                const scrollPos = window.scrollY;
+                const isInFluidSection = scrollPos < fluidHeight - 50;
+                
+                if (isInFluidSection) {
+                    navbar.classList.add('transparent');
+                    navbar.classList.remove('scrolled');
+                } else {
+                    navbar.classList.remove('transparent');
+                    if (scrollPos > 50) {
+                        navbar.classList.add('scrolled');
+                    }
+                }
+            });
+        }
     }
 }
 

@@ -371,6 +371,55 @@ body {
     box-shadow: var(--shadow-soft);
 }
 
+/* Transparent navbar variant used over the fluid intro */
+.navbar.transparent {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Ensure nav layout and behavior stays consistent */
+.navbar.transparent .nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar.transparent .nav-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+/* Mobile navigation styles - keep consistent with normal navbar */
+@media (max-width: 768px) {
+    .navbar.transparent {
+        background: transparent !important;
+    }
+    
+    .navbar.transparent .nav-links {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        right: 0;
+        background: var(--bg-overlay);
+        backdrop-filter: blur(20px);
+        padding: var(--space-lg);
+        transform: translateY(-110%);
+        transition: transform 0.3s ease;
+        z-index: -1;
+    }
+    
+    .navbar.transparent .nav-links.active {
+        transform: translateY(0);
+    }
+    
+    .navbar.transparent .hamburger span {
+        background: var(--text-primary);
+    }
+}
+
 .navbar.scrolled {
     padding: var(--space-sm) 0;
     box-shadow: var(--shadow-medium);
