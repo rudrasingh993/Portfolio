@@ -190,7 +190,7 @@
     bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 3;
+    z-index: 9999;
     display: none;
     flex-direction: column;
     align-items: center;
@@ -406,7 +406,7 @@ body {
         background: var(--bg-overlay);
         backdrop-filter: blur(20px);
         padding: var(--space-lg);
-        transform: translateY(-110%);
+        transform: translateY(-120%);
         transition: transform 0.3s ease;
         z-index: -1;
     }
