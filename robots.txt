@@ -1,4 +1,4 @@
-# robots.txt for https://www.rudrasingh.dev
+# robots.txt for https://www.rudrasingh.dev/
 User-agent: *
 Allow: /
 
