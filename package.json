@@ -1,0 +1,8 @@
+{
+  "name": "portfoloi-gfg",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "update-sitemap": "node update-lastmod.js"
+  }
+}
