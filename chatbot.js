@@ -54,9 +54,8 @@ async function getBotResponse(userInput) {
         // If no local answer, call the Gemini API
         // Try different model names as fallback (newest first)
         const models = [
-            'gemini-1.5-flash-latest',
-            'gemini-1.5-pro-latest',
-            'gemini-pro'
+            'gemini-flash-latest', // Corrected from gemini-1.5-flash-latest
+            'gemini-pro-latest'    // Corrected from gemini-1.5-pro-latest
         ];
         
         const apiVersions = ['v1beta', 'v1'];
@@ -68,6 +67,7 @@ Context about Rudra Pratap Singh:
 - His skills include Frontend (React, Next.js, Tailwind CSS), Backend (Node.js, Express, Python, FastAPI, PostgreSQL, MongoDB), Design Tools (Figma, Adobe XD), and Programming Languages (Python, Java, C++).
 - His email is rudrasingh14513@gmail.com.
 - He is passionate about exploring emerging tech and crafting designs that connect people in smarter ways.
+- If the user's question can be answered by the context provided, please use it. Otherwise, use your general knowledge.
 
 User's question: "${userInput}"
 
