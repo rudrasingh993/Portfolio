@@ -1,6 +1,30 @@
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all functionality
+    const isMobile = () => /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+    // Defer heavy scripts (fluid simulation) on mobile
+    if (!isMobile()) {
+        // Dynamically load scripts for desktop only
+        const datGuiScript = document.createElement('script');
+        datGuiScript.src = 'dat.gui.min.js';
+        document.body.appendChild(datGuiScript);
+
+        datGuiScript.onload = () => {
+            const fluidScript = document.createElement('script');
+            fluidScript.src = 'script2.js';
+            document.body.appendChild(fluidScript);
+
+            fluidScript.onload = () => {
+                // Hide the dat.gui panel once the script is loaded
+                const guiContainer = document.querySelector('.dg.main');
+                if (guiContainer) {
+                    guiContainer.style.display = 'none';
+                }
+            };
+        };
+    }
+
+    // Initialize all functionality, passing mobile status to functions that need it
     initTheme();
     initNavigation();
     initFluidIntro();
@@ -9,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initSkillBars();
     initContactForm();
     initSmoothScrolling();
-    initCreativeAnimations();
+    initCreativeAnimations(isMobile());
     initChatbot();
 });
 
@@ -484,8 +508,11 @@ function initSmoothScrolling() {
 }
 
 // Creative Animations and Interactions
-function initCreativeAnimations() {
+function initCreativeAnimations(isMobile) {
     // Profile frame 3D effect
+    // Disable on mobile for performance
+    if (isMobile) return;
+
     const profileFrame = document.querySelector('.profile-frame');
     if (profileFrame) {
         profileFrame.addEventListener('mousemove', function(e) {
@@ -534,7 +561,10 @@ function initCreativeAnimations() {
     });
     
     // Floating shapes interaction on scroll
+    // Disable on mobile for performance
     window.addEventListener('scroll', throttle(() => {
+        if (isMobile) return;
+
         const scrolled = window.pageYOffset;
         const shapes = document.querySelectorAll('.floating-shape');
         
