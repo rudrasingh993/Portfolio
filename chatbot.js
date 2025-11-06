@@ -25,18 +25,29 @@ async function getBotResponse(userInput) {
 
     // First, check the local knowledge base
     for (const keyword in knowledgeBase) {
-        if (userInput.includes(keyword)) {
+        if (keyword !== "default" && userInput.includes(keyword)) {
             return knowledgeBase[keyword];
         }
+    }
+    
+    // If no match found and it's a simple question, return default
+    if (userInput.length < 10) {
+        return knowledgeBase["default"];
     }
 
     try {
         // Fetch the API key from the serverless function
-        const apiKeyResponse = await fetch('/api/get-api-key.js');
+        const apiKeyResponse = await fetch('/api/get-api-key');
         if (!apiKeyResponse.ok) {
-            throw new Error('Failed to fetch API key');
+            throw new Error(`Failed to fetch API key: ${apiKeyResponse.status}`);
         }
-        const { apiKey } = await apiKeyResponse.json();
+        const apiKeyData = await apiKeyResponse.json();
+        
+        if (!apiKeyData.apiKey) {
+            throw new Error('API key not found in response');
+        }
+        
+        const apiKey = apiKeyData.apiKey;
 
         // If no local answer, call the Gemini API
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
@@ -64,17 +75,26 @@ Your answer:`;
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error?.message || 'Unknown error'}`);
         }
 
         const data = await response.json();
-        if (data.candidates && data.candidates.length > 0 && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
+        if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
             return data.candidates[0].content.parts[0].text;
         } else {
+            console.error('Unexpected API response structure:', data);
             return "I'm sorry, I couldn't generate a response at the moment. Please try again later.";
         }
     } catch (error) {
-        console.error('Error:', error);
-        return "I'm sorry, I'm having trouble connecting to the AI model right now. Please try again later.";
+        console.error('Chatbot Error:', error);
+        // Return a more helpful error message based on error type
+        if (error.message.includes('API key')) {
+            return "I'm sorry, there's a configuration issue with the AI service. Please contact the website owner.";
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            return "I'm sorry, I'm having trouble connecting to the internet right now. Please check your connection and try again.";
+        } else {
+            return "I'm sorry, I'm having trouble processing your request right now. Please try again later or ask a simpler question.";
+        }
     }
 }

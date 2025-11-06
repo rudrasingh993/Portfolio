@@ -2234,3 +2234,31 @@ section {
 #chatSend:hover {
     background: var(--accent-gold);
 }
+
+#chatSend:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#chatInput:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--bg-accent);
+}
+
+.loading-message {
+    opacity: 0.7;
+    font-style: italic;
+    position: relative;
+}
+
+.loading-message::after {
+    content: '...';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}

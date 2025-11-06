@@ -621,19 +621,49 @@ function initChatbot() {
         const userInput = chatInput.value.trim();
         if (userInput === '') return;
 
+        // Disable input while processing
+        chatInput.disabled = true;
+        chatSend.disabled = true;
+
         appendMessage(userInput, 'user-message');
         chatInput.value = '';
 
-        const botResponse = await getBotResponse(userInput);
-        appendMessage(botResponse, 'bot-message');
+        // Show loading indicator
+        const loadingMessage = appendMessage('Thinking...', 'bot-message loading-message');
+
+        try {
+            const botResponse = await getBotResponse(userInput);
+            // Remove loading message and add actual response
+            loadingMessage.remove();
+            appendMessage(botResponse, 'bot-message');
+        } catch (error) {
+            console.error('Error sending message:', error);
+            loadingMessage.remove();
+            appendMessage("I'm sorry, something went wrong. Please try again.", 'bot-message');
+        } finally {
+            // Re-enable input
+            chatInput.disabled = false;
+            chatSend.disabled = false;
+            chatInput.focus();
+        }
     }
 
     function appendMessage(text, className) {
         const messageElement = document.createElement('div');
-        messageElement.classList.add('message', className);
+        messageElement.classList.add('message');
+        // Handle multiple classes if provided
+        if (className) {
+            const classes = className.split(' ');
+            classes.forEach(cls => {
+                if (cls.trim()) {
+                    messageElement.classList.add(cls.trim());
+                }
+            });
+        }
         messageElement.textContent = text;
         chatMessages.appendChild(messageElement);
         chatMessages.scrollTop = chatMessages.scrollHeight;
+        return messageElement;
     }
 }
 
