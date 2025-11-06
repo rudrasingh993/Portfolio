@@ -121,20 +121,10 @@ function findLocalResponse(userInput) {
 }
 
 async function getBotResponse(userInput) {
-    // First, try to find a response from the local knowledge base
-    const localResponse = findLocalResponse(userInput);
-    if (localResponse) {
-        return localResponse;
-    }
-
-    // If no local match, and input is too short, return default.
-    if (userInput.trim().length < 5) {
-        return knowledgeBase["default"];
-    }
-
-    // If no local response, call the API
-    // Use a Web Worker to make the API call in a background thread
+    // All logic, including local search and API calls, is now offloaded to the worker
+    // to prevent blocking the main thread. This keeps the UI and animations smooth.
     return new Promise((resolve) => {
+        // We assume 'chat-worker.js' exists and is configured correctly.
         const worker = new Worker('chat-worker.js');
 
         // Listen for messages from the worker
@@ -160,7 +150,7 @@ async function getBotResponse(userInput) {
         };
 
         // Send the user input and knowledge base to the worker to start the API call
-        worker.postMessage({ userInput, knowledgeBase });
+        worker.postMessage({ userInput, knowledgeBase, localFallbackResponses });
     });
 }
 
