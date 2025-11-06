@@ -199,7 +199,9 @@ function initNavigation() {
         link.addEventListener('click', () => {
             hamburger.classList.remove('active');
             navLinks.classList.remove('active');
-            document.body.style.overflow = '';
+            if (window.innerWidth <= 768) {
+                document.body.style.overflow = '';
+            }
         });
     });
 
@@ -514,8 +516,8 @@ function initCreativeAnimations() {
             case 'github': hoverColor = '#333'; break;
             case 'linkedin': hoverColor = '#0077b5'; break;
             case 'telegram': hoverColor = '#1da1f2'; break;
-            case 'dribbble': hoverColor = '#ea4c89'; break;
-            default: hoverColor = 'var(--accent-primary)';
+            case 'discord': hoverColor = '#5865F2'; break;
+            default: hoverColor = 'var(--accent-primary)'; // Fallback color
         }
         
         link.addEventListener('mouseenter', function() {
