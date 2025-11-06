@@ -21,9 +21,9 @@ const knowledgeBase = {
 };
 
 async function getBotResponse(userInput) {
-    userInput = userInput.toLowerCase();
+    userInput = userInput.toLowerCase().trim();
 
-    // First, check the local knowledge base
+    // First, check the local knowledge base with improved matching
     for (const keyword in knowledgeBase) {
         if (keyword !== "default" && userInput.includes(keyword)) {
             return knowledgeBase[keyword];
@@ -35,6 +35,8 @@ async function getBotResponse(userInput) {
         return knowledgeBase["default"];
     }
 
+    // Try to use API, but don't fail if it doesn't work - fall back to knowledge base
+    let apiResponse = null;
     try {
         // Fetch the API key from the serverless function
         const apiKeyResponse = await fetch('/api/get-api-key');
@@ -50,10 +52,10 @@ async function getBotResponse(userInput) {
         const apiKey = apiKeyData.apiKey;
 
         // If no local answer, call the Gemini API
-        // Try different model names as fallback
+        // Try different model names as fallback (newest first)
         const models = [
-            'gemini-1.5-flash',
-            'gemini-1.5-pro',
+            'gemini-1.5-flash-latest',
+            'gemini-1.5-pro-latest',
             'gemini-pro'
         ];
         
@@ -75,10 +77,38 @@ Your answer:`;
             "contents": [{"parts":[{"text": prompt}]}]
         });
 
+        // First, try to get list of available models (optional, for debugging)
+        let availableModels = null;
+        try {
+            const listModelsUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+            const listResponse = await fetch(listModelsUrl);
+            if (listResponse.ok) {
+                const listData = await listResponse.json();
+                if (listData.models) {
+                    availableModels = listData.models.map(m => m.name?.replace('models/', '') || m.name).filter(Boolean);
+                    console.log('Available models:', availableModels);
+                }
+            }
+        } catch (e) {
+            // Ignore errors when listing models, just continue with predefined list
+            console.log('Could not list available models, using predefined list');
+        }
+
         // Try different models and API versions
         let lastError = null;
+        let triedModels = [];
+        
+        // If we got available models, prioritize those
+        const modelsToTry = availableModels && availableModels.length > 0 
+            ? [...models.filter(m => availableModels.some(am => am.includes(m))), ...models]
+            : models;
+        
         for (const version of apiVersions) {
-            for (const model of models) {
+            for (const model of modelsToTry) {
+                // Skip if we already tried this model
+                if (triedModels.includes(`${version}/${model}`)) continue;
+                triedModels.push(`${version}/${model}`);
+                
                 try {
                     const API_URL = `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`;
                     
@@ -92,12 +122,25 @@ Your answer:`;
 
                     if (!response.ok) {
                         const errorData = await response.json().catch(() => ({}));
-                        lastError = new Error(`HTTP error! status: ${response.status}, message: ${errorData.error?.message || 'Unknown error'}`);
+                        const errorMsg = errorData.error?.message || 'Unknown error';
+                        lastError = new Error(`HTTP error! status: ${response.status}, message: ${errorMsg}`);
+                        
+                        // If it's a 404, continue to next model
+                        if (response.status === 404) {
+                            console.log(`Model ${model} not found with ${version}, trying next...`);
+                            continue;
+                        }
+                        // For other errors (like 403), might be permission issue
+                        if (response.status === 403) {
+                            console.error(`Permission denied for ${model} with ${version}:`, errorMsg);
+                            continue;
+                        }
                         continue; // Try next model
                     }
 
                     const data = await response.json();
                     if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
+                        console.log(`Successfully used model: ${model} with ${version}`);
                         return data.candidates[0].content.parts[0].text;
                     } else {
                         console.error('Unexpected API response structure:', data);
@@ -111,23 +154,45 @@ Your answer:`;
             }
         }
         
-        // If all models failed, throw the last error
+        // If all models failed, log but don't throw - we'll fall back to knowledge base
         if (lastError) {
-            throw lastError;
-        }
-        
-        return "I'm sorry, I couldn't generate a response at the moment. Please try again later.";
-    } catch (error) {
-        console.error('Chatbot Error:', error);
-        // Return a more helpful error message based on error type
-        if (error.message.includes('API key')) {
-            return "I'm sorry, there's a configuration issue with the AI service. Please contact the website owner.";
-        } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-            return "I'm sorry, I'm having trouble connecting to the internet right now. Please check your connection and try again.";
-        } else if (error.message.includes('404') || error.message.includes('not found')) {
-            return "I'm sorry, the AI model is currently unavailable. Please try asking a question from my knowledge base or contact Rudra directly.";
+            console.warn('API unavailable, falling back to knowledge base. Error:', lastError.message);
+            apiResponse = null;
         } else {
-            return "I'm sorry, I'm having trouble processing your request right now. Please try again later or ask a simpler question.";
+            apiResponse = "I'm sorry, I couldn't generate a response at the moment. Please try again later.";
         }
+    } catch (error) {
+        // Silently handle API errors - we'll use knowledge base fallback
+        console.warn('API error (using fallback):', error.message);
+        apiResponse = null;
     }
+    
+    // If API worked, return the response
+    if (apiResponse) {
+        return apiResponse;
+    }
+    
+    // Fallback to knowledge base with helpful message
+    // Try to provide a more contextual response based on keywords
+    const userWords = userInput.split(/\s+/);
+    const portfolioKeywords = ['portfolio', 'website', 'site', 'page'];
+    const skillKeywords = ['skill', 'technology', 'tech', 'language', 'framework', 'tool'];
+    const projectKeywords = ['project', 'work', 'build', 'create', 'develop'];
+    const contactKeywords = ['contact', 'reach', 'email', 'phone', 'message', 'connect'];
+    const aboutKeywords = ['about', 'who', 'what', 'where', 'when', 'why', 'how'];
+    
+    if (userWords.some(word => portfolioKeywords.includes(word))) {
+        return "This is Rudra Pratap Singh's portfolio website showcasing his skills, projects, and experience as an AI/ML enthusiast and developer. Feel free to explore the different sections to learn more about him!";
+    } else if (userWords.some(word => skillKeywords.includes(word))) {
+        return "Rudra has expertise in Frontend (React, Next.js, Tailwind CSS), Backend (Node.js, Express, Python, FastAPI, PostgreSQL, MongoDB), Design Tools (Figma, Adobe XD), and Programming Languages (Python, Java, C++). Check out the Skills section for more details!";
+    } else if (userWords.some(word => projectKeywords.includes(word))) {
+        return "Rudra is currently working on exciting projects that will be showcased here soon. He believes in quality over quantity, so stay tuned for impressive work! You can check the Projects section for updates.";
+    } else if (userWords.some(word => contactKeywords.includes(word))) {
+        return "You can reach Rudra through the contact form on this website or by email at rudrasingh14513@gmail.com. He's always open to new opportunities and collaborations!";
+    } else if (userWords.some(word => aboutKeywords.includes(word))) {
+        return "Rudra Pratap Singh is a passionate AI/ML enthusiast and creative developer. He loves building beautiful and functional web experiences. Explore the About section to learn more about his journey!";
+    }
+    
+    // Final fallback
+    return `I understand you're asking about "${userInput}". While I'm currently operating in a limited mode, I can help you with questions about Rudra's skills, projects, contact information, or his portfolio. Feel free to ask about those topics, or use the contact form to reach out directly!`;
 }

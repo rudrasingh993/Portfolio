@@ -637,12 +637,12 @@ function initChatbot() {
             loadingMessage.remove();
             appendMessage(botResponse, 'bot-message');
         } catch (error) {
-            console.error('Error sending message:', error);
+            console.error('Chatbot Error:', error);
             loadingMessage.remove();
             appendMessage("I'm sorry, something went wrong. Please try again.", 'bot-message');
         } finally {
             // Re-enable input
-            chatInput.disabled = false;
+            chatInput.disabled = false; 
             chatSend.disabled = false;
             chatInput.focus();
         }
