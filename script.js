@@ -602,6 +602,37 @@ function initChatbot() {
     const chatInput = document.getElementById('chatInput');
     const chatSend = document.getElementById('chatSend');
 
+    const CHAT_HISTORY_KEY = 'rudra_chat_history';
+    let chatHistory = [];
+
+    // Saves the current chat history to localStorage
+    function saveHistory() {
+        try {
+            localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(chatHistory));
+        } catch (error) {
+            console.error('Could not save chat history:', error);
+        }
+    }
+
+    // Loads chat history from localStorage and displays it
+    function loadHistory() {
+        try {
+            chatMessages.innerHTML = ''; // Clear any existing messages first
+            const savedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+            if (savedHistory && JSON.parse(savedHistory).length > 0) {
+                chatHistory = JSON.parse(savedHistory);
+                chatHistory.forEach(msg => appendMessage(msg.text, msg.className, false)); // Don't save while loading
+            } else {
+                // If no history, add and save the initial bot message
+                appendMessage('Hello! How can I help you?', 'bot-message');
+            }
+        } catch (error) {
+            console.error('Could not load chat history:', error);
+            // Fallback to default message if loading fails
+            appendMessage('Hello! How can I help you?', 'bot-message');
+        }
+    }
+
     chatIcon.addEventListener('click', () => {
         chatWindow.classList.toggle('active');
     });
@@ -625,17 +656,17 @@ function initChatbot() {
         chatInput.disabled = true;
         chatSend.disabled = true;
 
-        appendMessage(userInput, 'user-message');
+        appendMessage(userInput, 'user-message'); // This will also save the user message
         chatInput.value = '';
 
         // Show loading indicator
-        const loadingMessage = appendMessage('Thinking...', 'bot-message loading-message');
+        const loadingMessage = appendMessage('Thinking...', 'bot-message loading-message', false);
 
         try {
             const botResponse = await getBotResponse(userInput);
             // Remove loading message and add actual response
             loadingMessage.remove();
-            appendMessage(botResponse, 'bot-message');
+            appendMessage(botResponse, 'bot-message'); // This will also save the bot response
         } catch (error) {
             console.error('Chatbot Error:', error);
             loadingMessage.remove();
@@ -648,7 +679,7 @@ function initChatbot() {
         }
     }
 
-    function appendMessage(text, className) {
+    function appendMessage(text, className, shouldSave = true) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
         // Handle multiple classes if provided
@@ -663,8 +694,18 @@ function initChatbot() {
         messageElement.textContent = text;
         chatMessages.appendChild(messageElement);
         chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Add to history and save, if required
+        if (shouldSave) {
+            chatHistory.push({ text, className });
+            saveHistory();
+        }
+
         return messageElement;
     }
+
+    // Load the chat history when the chatbot is initialized
+    loadHistory();
 }
 
 
