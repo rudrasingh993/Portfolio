@@ -50,8 +50,15 @@ async function getBotResponse(userInput) {
         const apiKey = apiKeyData.apiKey;
 
         // If no local answer, call the Gemini API
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
-
+        // Try different model names as fallback
+        const models = [
+            'gemini-1.5-flash',
+            'gemini-1.5-pro',
+            'gemini-pro'
+        ];
+        
+        const apiVersions = ['v1beta', 'v1'];
+        
         const prompt = `You are a helpful and friendly chatbot on Rudra Pratap Singh's portfolio website. Your name is RudraBot. Please answer the user's question based on the provided context about Rudra, or from your general knowledge if the question is not about Rudra. Keep your answers concise and engaging.
 
 Context about Rudra Pratap Singh:
@@ -64,28 +71,52 @@ User's question: "${userInput}"
 
 Your answer:`;
 
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                "contents": [{"parts":[{"text": prompt}]}]
-            }),
+        const requestBody = JSON.stringify({
+            "contents": [{"parts":[{"text": prompt}]}]
         });
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error?.message || 'Unknown error'}`);
-        }
+        // Try different models and API versions
+        let lastError = null;
+        for (const version of apiVersions) {
+            for (const model of models) {
+                try {
+                    const API_URL = `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`;
+                    
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: requestBody,
+                    });
 
-        const data = await response.json();
-        if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
-            return data.candidates[0].content.parts[0].text;
-        } else {
-            console.error('Unexpected API response structure:', data);
-            return "I'm sorry, I couldn't generate a response at the moment. Please try again later.";
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        lastError = new Error(`HTTP error! status: ${response.status}, message: ${errorData.error?.message || 'Unknown error'}`);
+                        continue; // Try next model
+                    }
+
+                    const data = await response.json();
+                    if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
+                        return data.candidates[0].content.parts[0].text;
+                    } else {
+                        console.error('Unexpected API response structure:', data);
+                        lastError = new Error('Unexpected API response structure');
+                        continue; // Try next model
+                    }
+                } catch (fetchError) {
+                    lastError = fetchError;
+                    continue; // Try next model
+                }
+            }
         }
+        
+        // If all models failed, throw the last error
+        if (lastError) {
+            throw lastError;
+        }
+        
+        return "I'm sorry, I couldn't generate a response at the moment. Please try again later.";
     } catch (error) {
         console.error('Chatbot Error:', error);
         // Return a more helpful error message based on error type
@@ -93,6 +124,8 @@ Your answer:`;
             return "I'm sorry, there's a configuration issue with the AI service. Please contact the website owner.";
         } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
             return "I'm sorry, I'm having trouble connecting to the internet right now. Please check your connection and try again.";
+        } else if (error.message.includes('404') || error.message.includes('not found')) {
+            return "I'm sorry, the AI model is currently unavailable. Please try asking a question from my knowledge base or contact Rudra directly.";
         } else {
             return "I'm sorry, I'm having trouble processing your request right now. Please try again later or ask a simpler question.";
         }
