@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initContactForm();
     initSmoothScrolling();
     initCreativeAnimations();
+    initChatbot();
 });
 
 // Fluid Intro Interactive Features
@@ -591,6 +592,52 @@ resizeObserver.observe(document.documentElement);
 // Console Branding
 console.log('%c🏛️ Welcome to my  Portfolio!', 
     'color: #8b6f47; font-size: 24px; font-weight: 600; font-family: "Playfair Display", serif;');
+
+// Chatbot functionality
+function initChatbot() {
+    const chatIcon = document.getElementById('chatIcon');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatClose = document.getElementById('chatClose');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+
+    chatIcon.addEventListener('click', () => {
+        chatWindow.classList.toggle('active');
+    });
+
+    chatClose.addEventListener('click', () => {
+        chatWindow.classList.remove('active');
+    });
+
+    chatSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    async function sendMessage() {
+        const userInput = chatInput.value.trim();
+        if (userInput === '') return;
+
+        appendMessage(userInput, 'user-message');
+        chatInput.value = '';
+
+        const botResponse = await getBotResponse(userInput);
+        appendMessage(botResponse, 'bot-message');
+    }
+
+    function appendMessage(text, className) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', className);
+        messageElement.textContent = text;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+
 
     
     
