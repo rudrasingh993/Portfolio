@@ -89,8 +89,7 @@ const localFallbackResponses = [
         { keywords: ['skill', 'technology', 'tech', 'language', 'framework', 'tool'], response: "Rudra has expertise in Frontend (React, Next.js, Tailwind CSS), Backend (Node.js, Express, Python, FastAPI, PostgreSQL, MongoDB), Design Tools (Figma, Adobe XD), and Programming Languages (Python, Java, C++). Check out the Skills section for more details!" },
         { keywords: ['project', 'work', 'build', 'create', 'develop'], response: "Rudra is currently working on exciting projects that will be showcased here soon. He believes in quality over quantity, so stay tuned for impressive work! You can check the Projects section for updates." },
         { keywords: ['contact', 'reach', 'email', 'phone', 'message', 'connect'], response: "You can reach Rudra through the contact form on this website or by email at rudrasingh14513@gmail.com. He's always open to new opportunities and collaborations!" },
-        { keywords: ['about', 'who', 'what', 'where', 'when', 'why', 'how'], response: "Rudra Pratap Singh is a passionate AI/ML enthusiast and creative developer. He loves building beautiful and functional web experiences. Explore the About section to learn more about his journey!" }
-    ];
+        ];
 
 function findLocalResponse(userInput) {
     const lowerInput = userInput.toLowerCase().trim();
@@ -134,25 +133,35 @@ async function getBotResponse(userInput) {
     }
 
     // If no local response, call the API
-    try {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userInput: userInput, knowledgeBase: knowledgeBase }),
-        });
+    // Use a Web Worker to make the API call in a background thread
+    return new Promise((resolve) => {
+        const worker = new Worker('chat-worker.js');
 
-        if (!response.ok) {
-            throw new Error(`API request failed with status ${response.status}`);
-        }
+        // Listen for messages from the worker
+        worker.onmessage = function(event) {
+            const { success, response, error } = event.data;
 
-        const data = await response.json();
-        return data.response;
+            if (success) {
+                resolve(response);
+            } else {
+                console.warn('API call failed via worker, using fallback:', error);
+                resolve(`I understand you're asking about "${userInput}". While I'm having trouble connecting to my brain right now 🧠, I can still help with questions about Rudra's skills, projects, or contact info. Try asking one of those!`);
+            }
 
-    } catch (error) {
-        console.warn('API call failed, using fallback:', error.message);
-        // Final fallback if API fails
-        return `I understand you're asking about "${userInput}". While I'm having trouble connecting to my brain right now 🧠, I can still help with questions about Rudra's skills, projects, or contact info. Try asking one of those!`;
-    }
+            // Terminate the worker once it's done
+            worker.terminate();
+        };
+
+        // Handle any errors in the worker itself
+        worker.onerror = function(error) {
+            console.error('Error in chat worker:', error.message);
+            resolve("I'm sorry, something went wrong. Please try again.");
+            worker.terminate();
+        };
+
+        // Send the user input and knowledge base to the worker to start the API call
+        worker.postMessage({ userInput, knowledgeBase });
+    });
 }
 
 /*
@@ -161,7 +170,7 @@ async function getBotResponse(userInput) {
     for (const item of fallbackResponses) {
         if (userWords.some(word => item.keywords.includes(word))) {
             return item.response;
-        }
+        });
     }
     
     // Final fallback
