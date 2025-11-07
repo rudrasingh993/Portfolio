@@ -19,14 +19,32 @@ export default async function handler(req, res) {
         return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { status: 405 });
     }
 
-    const { userInput, chatHistory, knowledgeBase, suggestions = [] } = await req.json();
+    const { userInput, chatHistory, knowledgeBase } = await req.json();
     
-    // Default suggestions if none provided
-    const defaultSuggestions = [
+    // Define default suggestions
+    const SUGGESTIONS = [
         "What are his main skills?",
         "Tell me about a project.",
         "How do I contact him?"
     ];
+
+    function generateContextualSuggestions(input) {
+        if (input.toLowerCase().includes('project')) {
+            return [
+                "Tell me more about the chatbot project",
+                "What other projects are planned?",
+                "What technologies do you use?"
+            ];
+        }
+        if (input.toLowerCase().includes('skill')) {
+            return [
+                "What programming languages do you know?",
+                "Tell me about your web development skills",
+                "What frameworks do you use?"
+            ];
+        }
+        return SUGGESTIONS;
+    }
 
     if (!userInput) {
         return new Response(JSON.stringify({ error: 'User input is required' }), { status: 400 });
@@ -35,8 +53,10 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
         console.error('GEMINI_API_KEY is NOT set in Vercel environment variables.');
-        console.error('GEMINI_API_KEY is not set');
-        return new Response(JSON.stringify({ error: 'API key not configured' }), { status: 500 });
+        return new Response(JSON.stringify({ 
+            error: 'API key not configured',
+            suggestions: SUGGESTIONS
+        }), { status: 500 });
     }
 
     // Dynamically generate context from the provided knowledge base
@@ -122,7 +142,11 @@ Your answer:`;
             const errorData = await apiResponse.json().catch(() => ({}));
             const errorMsg = errorData.error?.message || 'Unknown API error';
             console.error(`Gemini API returned non-OK status: ${apiResponse.status}, Message: ${errorMsg}, Details:`, errorData);
-            throw new Error(`API Error (${apiResponse.status}): ${errorMsg}`);
+            // Return error with contextual suggestions
+            return new Response(JSON.stringify({ 
+                error: `API Error (${apiResponse.status}): ${errorMsg}`,
+                suggestions: generateContextualSuggestions(userInput)
+            }), { status: apiResponse.status });
         }
 
         // The response from Gemini with alt=sse is already a stream. We can pipe it directly.
@@ -130,6 +154,10 @@ Your answer:`;
 
     } catch (error) {
         console.error('Error calling Gemini API:', error);
-        return new Response(JSON.stringify({ error: 'AI service is currently unavailable.' }), { status: 503 });
+        // Return error with default suggestions
+        return new Response(JSON.stringify({ 
+            error: 'AI service is currently unavailable.',
+            suggestions: SUGGESTIONS
+        }), { status: 503 });
     }
 }
