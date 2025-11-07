@@ -52,7 +52,6 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-        console.error('GEMINI_API_KEY is NOT set in Vercel environment variables.');
         return new Response(JSON.stringify({ 
             error: 'API key not configured',
             suggestions: SUGGESTIONS
@@ -62,15 +61,18 @@ export default async function handler(req, res) {
     // Expanded list of models for chat, ordered from most preferred to least.
     // This provides fallbacks if one model is unavailable or rate-limited.
     const models = [
-        'gemini-1.5-flash-latest',     // Alias for the latest flash model (fast and cost-effective)
-        'gemini-pro-latest',           // Alias for the latest pro model (more powerful)
+        'gemini-2.5-pro',              // Most powerful, high quality
+        'gemini-2.5-flash',            // Fast and cost-effective
+        'gemini-1.5-flash-latest',     // Alias for the latest flash model
+        'gemini-pro-latest',           // Alias for the latest pro model
         'gemini-2.0-flash',
         'gemini-2.5-flash-lite',
         'gemini-2.0-flash-lite',
         'gemini-2.0-flash-live',
         'gemini-2.5-flash-live',
         'gemini-2.0-flash-exp',
-        'learnlm-2.0-flash-experimental'
+        'learnlm-2.0-flash-experimental',
+        'gemini-pro',                  // Stable version, good fallback
     ];
 
     // It's generally best to stick with 'v1beta' for streaming features.
@@ -134,7 +136,7 @@ Bot: "Why did the developer go broke? Because he used up all his cache! 😂"
 
 **Your Task:**
 1.  Provide a helpful and engaging response to the user's question.
-2.  After your response, on a new line, add a special marker [SUGGESTIONS].
+2.  After your response, on a new line, add a special marker `[SUGGESTIONS]`.
 3.  After the marker, provide exactly three short, relevant follow-up questions that the user might ask next. Separate them with a pipe character (|). Do not add a newline after the suggestions.
 
 **Example Output Format:**
