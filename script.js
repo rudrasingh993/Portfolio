@@ -2,38 +2,34 @@
 document.addEventListener('DOMContentLoaded', function() {
     const isMobile = () => /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
-    // Defer heavy scripts (fluid simulation) on mobile
-    if (!isMobile()) {
-        // Dynamically load scripts for desktop only
-        const datGuiScript = document.createElement('script');
-        datGuiScript.src = 'dat.gui.min.js';
-        document.body.appendChild(datGuiScript);
+    // Dynamically load fluid simulation scripts on all devices.
+    // The animation will be paused/resumed based on visibility.
+    const datGuiScript = document.createElement('script');
+    datGuiScript.src = 'dat.gui.min.js';
+    document.body.appendChild(datGuiScript);
 
-        datGuiScript.onload = () => {
-            const fluidScript = document.createElement('script');
-            fluidScript.src = 'script2.js';
-            document.body.appendChild(fluidScript);
+    datGuiScript.onload = () => {
+        const fluidScript = document.createElement('script');
+        fluidScript.src = 'script2.js';
+        document.body.appendChild(fluidScript);
 
-            fluidScript.onload = () => {
-                // Hide the dat.gui panel once the script is loaded
-                const guiContainer = document.querySelector('.dg.main');
-                if (guiContainer) {
-                    guiContainer.style.display = 'none';
-                }
-            };
+        fluidScript.onload = () => {
+            // Hide the dat.gui panel once the script is loaded
+            const guiContainer = document.querySelector('.dg.main');
+            if (guiContainer) {
+                guiContainer.style.display = 'none';
+            }
+            // The fluid intro logic will now handle pausing/resuming, so we call it here.
+            initFluidIntro();
         };
-    }
+    };
 
     // Initialize all functionality, passing mobile status to functions that need it
     initTheme();
     initNavigation();
-    initFluidIntro();
     initScrollEffects();
     initTypingAnimation();
     initSkillBars();
-    initContactForm();
-    initSmoothScrolling();
-    initCreativeAnimations(isMobile());
     initChatbot();
 });
 
@@ -123,6 +119,23 @@ function initFluidIntro() {
                     }
                 }
             });
+        }
+
+        // Pause/Resume fluid animation based on visibility
+        if ('IntersectionObserver' in window && typeof window.toggleFluidAnimation === 'function') {
+            const fluidObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Section is visible, resume animation
+                        window.toggleFluidAnimation(false);
+                    } else {
+                        // Section is not visible, pause animation
+                        window.toggleFluidAnimation(true);
+                    }
+                });
+            }, { threshold: 0.01 }); // Trigger even if 1% is visible
+
+            fluidObserver.observe(fluidSection);
         }
     }
 }

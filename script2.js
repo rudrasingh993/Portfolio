@@ -1583,3 +1583,11 @@ function hashCode (s) {
     }
     return hash;
 };
+
+/**
+ * Expose a global function to control the fluid animation.
+ * @param {boolean} shouldPause - True to pause the animation, false to resume.
+ */
+window.toggleFluidAnimation = function(shouldPause) {
+    config.PAUSED = shouldPause;
+};
