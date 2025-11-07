@@ -27,6 +27,7 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
+        console.error('GEMINI_API_KEY is NOT set in Vercel environment variables.');
         console.error('GEMINI_API_KEY is not set');
         return new Response(JSON.stringify({ error: 'API key not configured' }), { status: 500 });
     }
@@ -97,6 +98,7 @@ Your answer:`;
 
     const requestBody = {
         contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { stopSequences: ["[SUGGESTIONS]"] } // Add stop sequence to prevent suggestions from being part of the main response
     };
 
     try {
@@ -107,11 +109,14 @@ Your answer:`;
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody),
+            // Add a timeout for the fetch request to prevent hanging
+            signal: AbortSignal.timeout(10000) // 10 seconds timeout
         });
 
         if (!apiResponse.ok) {
             const errorData = await apiResponse.json().catch(() => ({}));
             const errorMsg = errorData.error?.message || 'Unknown API error';
+            console.error(`Gemini API returned non-OK status: ${apiResponse.status}, Message: ${errorMsg}, Details:`, errorData);
             throw new Error(`API Error (${apiResponse.status}): ${errorMsg}`);
         }
 
