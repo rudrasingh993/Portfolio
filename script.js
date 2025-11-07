@@ -944,44 +944,60 @@ function initChatbot() {
                 const botMessageContainer = appendMessage('', 'bot-message', false);
                 const botMessageElement = botMessageContainer.querySelector('.message');
 
+                // --- Robust Streaming Logic ---
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let fullResponseText = '';
                 let suggestionsText = '';
                 let suggestionsFound = false;
+                let buffer = '';
 
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
 
-                    const chunk = decoder.decode(value, { stream: true });
-                    const jsonChunks = chunk.replace(/^data: /gm, '').split('\n').filter(s => s.trim());
+                    // Add the new chunk to our buffer
+                    buffer += decoder.decode(value, { stream: true });
 
-                    for (const jsonChunk of jsonChunks) {
+                    // Process all complete SSE messages in the buffer
+                    let boundary;
+                    while ((boundary = buffer.indexOf('\n\n')) !== -1) {
+                        const message = buffer.substring(0, boundary);
+                        buffer = buffer.substring(boundary + 2);
+
+                        // Ignore empty messages
+                        if (message.trim() === '') continue;
+
+                        // Extract the JSON part of the SSE message
+                        const jsonString = message.replace(/^data: /, '');
+
                         try {
-                            const parsed = JSON.parse(jsonChunk);
-                            let textChunk = parsed.candidates[0].content.parts[0].text;
+                            const parsed = JSON.parse(jsonString);
+                            const textChunk = parsed?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-                            if (suggestionsFound) {
-                                suggestionsText += textChunk;
-                            } else if (textChunk.includes('[SUGGESTIONS]')) {
-                                suggestionsFound = true;
+                            // Check if the suggestions marker is in this chunk
+                            if (!suggestionsFound && textChunk.includes('[SUGGESTIONS]')) {
                                 const parts = textChunk.split('[SUGGESTIONS]');
-                                textChunk = parts[0];
-                                suggestionsText = parts[1] || '';
+                                fullResponseText += parts[0]; // Add text before the marker
+                                suggestionsText = parts[1] || ''; // Start capturing suggestions
+                                suggestionsFound = true;
+                            } else if (suggestionsFound) {
+                                // If marker was found, all subsequent text is part of suggestions
+                                suggestionsText += textChunk;
+                            } else {
+                                // If no marker yet, it's all part of the main response
+                                fullResponseText += textChunk;
                             }
 
-                            if (!suggestionsFound) {
-                                fullResponseText += textChunk;
-                                renderMessageContent(botMessageElement, fullResponseText);
-                                chatMessages.scrollTop = chatMessages.scrollHeight;
-                            }
+                            // Render only the main response text as it streams
+                            renderMessageContent(botMessageElement, fullResponseText);
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+
                         } catch (e) {
-                            // Ignore parsing errors for incomplete chunks
+                            console.warn('Skipping invalid JSON chunk in stream:', jsonString);
                         }
                     }
                 }
-
                 // Finalize message content and save
                 renderMessageContent(botMessageElement, fullResponseText, true); // Final render with highlighting
                 chatHistory.push({ text: fullResponseText, className: 'bot-message' });
