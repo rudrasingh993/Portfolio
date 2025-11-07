@@ -98,7 +98,6 @@ Your answer:`;
 
     const requestBody = {
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { stopSequences: ["[SUGGESTIONS]"] } // Add stop sequence to prevent suggestions from being part of the main response
     };
 
     try {
