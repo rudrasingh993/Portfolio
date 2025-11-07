@@ -935,77 +935,25 @@ function initChatbot() {
                     }),
                 });
 
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.statusText}`);
-                }
-
-                // Create a new message element to stream into
-                loadingMessage.remove();
-                const botMessageContainer = appendMessage('', 'bot-message', false);
-                const botMessageElement = botMessageContainer.querySelector('.message');
-
-                // --- Robust Streaming Logic ---
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let fullResponseText = '';
-                let suggestionsText = '';
-                let suggestionsFound = false;
-                let buffer = '';
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-
-                    // Add the new chunk to our buffer
-                    buffer += decoder.decode(value, { stream: true });
-
-                    // Process all complete SSE messages in the buffer
-                    let boundary;
-                    while ((boundary = buffer.indexOf('\n\n')) !== -1) {
-                        const message = buffer.substring(0, boundary);
-                        buffer = buffer.substring(boundary + 2);
-
-                        // Ignore empty messages
-                        if (message.trim() === '') continue;
-
-                        // Extract the JSON part of the SSE message
-                        const jsonString = message.replace(/^data: /, '');
-
-                        try {
-                            const parsed = JSON.parse(jsonString);
-                            const textChunk = parsed?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-                            // Check if the suggestions marker is in this chunk
-                            if (!suggestionsFound && textChunk.includes('[SUGGESTIONS]')) {
-                                const parts = textChunk.split('[SUGGESTIONS]');
-                                fullResponseText += parts[0]; // Add text before the marker
-                                suggestionsText = parts[1] || ''; // Start capturing suggestions
-                                suggestionsFound = true;
-                            } else if (suggestionsFound) {
-                                // If marker was found, all subsequent text is part of suggestions
-                                suggestionsText += textChunk;
-                            } else {
-                                // If no marker yet, it's all part of the main response
-                                fullResponseText += textChunk;
-                            }
-
-                            // Render only the main response text as it streams
-                            renderMessageContent(botMessageElement, fullResponseText);
-                            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                        } catch (e) {
-                            console.warn('Skipping invalid JSON chunk in stream:', jsonString);
-                        }
+                if (response.ok) {
+                    const data = await response.json();
+                    loadingMessage.remove();
+                    
+                    if (data.response) {
+                        appendMessage(data.response, 'bot-message');
+                    } else {
+                        throw new Error("Received an empty response from the AI.");
                     }
+
+                    if (data.suggestions && data.suggestions.length > 0) {
+                        showSuggestions(data.suggestions);
+                    }
+                } else {
+                    throw new Error(`API request failed with status ${response.status}`);
                 }
-                // Finalize message content and save
-                renderMessageContent(botMessageElement, fullResponseText, true); // Final render with highlighting
-                chatHistory.push({ text: fullResponseText, className: 'bot-message' });
-                saveHistory();
-                showSuggestions(suggestionsText.split('|').filter(s => s.trim()));
             }
         } catch (error) {
-            console.error('Chatbot Error:', error);
+            console.error('Chatbot sendMessage error:', error);
             loadingMessage.remove();
             appendMessage("I'm sorry, something went wrong. Please try again.", 'bot-message');
         } finally {

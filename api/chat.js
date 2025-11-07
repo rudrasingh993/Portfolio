@@ -151,7 +151,7 @@ Your answer:`;
 
     for (const version of apiVersions) {
         for (const model of models) {
-            const API_URL = `https://generativelanguage.googleapis.com/${version}/models/${model}:streamGenerateContent?key=${apiKey}&alt=sse`;
+            const API_URL = `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`;
             console.log(`Attempting to call model: ${model} with API version: ${version}`);
 
             const controller = new AbortController();
@@ -168,9 +168,25 @@ Your answer:`;
                 clearTimeout(timeoutId);
 
                 if (apiResponse.ok) {
-                    // If successful, return the streaming response immediately
-                    return new Response(apiResponse.body, {
-                        headers: { 'Content-Type': 'text/event-stream' }
+                    // Non-streaming: get the full JSON response
+                    const data = await apiResponse.json();
+                    const fullText = data.candidates[0].content.parts[0].text;
+
+                    let responseText = fullText;
+                    let suggestions = [];
+                    const suggestionsMarker = '[SUGGESTIONS]';
+
+                    if (fullText.includes(suggestionsMarker)) {
+                        const parts = fullText.split(suggestionsMarker);
+                        responseText = parts[0].trim();
+                        suggestions = parts[1].trim().split('|').filter(s => s);
+                    }
+
+                    return new Response(JSON.stringify({
+                        response: responseText,
+                        suggestions: suggestions
+                    }), {
+                        headers: { 'Content-Type': 'application/json' }
                     });
                 }
 

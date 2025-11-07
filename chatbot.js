@@ -121,65 +121,24 @@ function findLocalResponse(userInput) {
 }
 
 async function getBotResponse(userInput, chatHistory) {
-    // Create a new worker for this request
-    const worker = new Worker('chat-worker.js');
-
+    // All logic, including local search and API calls, is now offloaded to the worker
+    // to prevent blocking the main thread. This keeps the UI and animations smooth.
     return new Promise((resolve) => {
+        // We assume 'chat-worker.js' exists and is configured correctly.
+        const worker = new Worker('chat-worker.js');
+
         // Listen for messages from the worker
-        worker.onmessage = async function(event) {
-            const { type, response, suggestions, error } = event.data;
+        worker.onmessage = function(event) {
+            const { success, response, error } = event.data;
 
-            if (type === 'local') {
-                // For local responses, resolve immediately
+            if (success) {
                 resolve(response);
-                worker.terminate();
-            } else if (type === 'stream') {
-                // For streaming responses, make the API call
-                try {
-                    const apiResponse = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            userInput,
-                            chatHistory,
-                            knowledgeBase
-                        })
-                    });
-
-                    if (!apiResponse.ok) {
-                        throw new Error(`API call failed: ${apiResponse.status}`);
-                    }
-
-                    const reader = apiResponse.body.getReader();
-                    let partialResponse = '';
-
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        
-                        if (done) break;
-                        
-                        // Convert the chunk to text
-                        const chunk = new TextDecoder().decode(value);
-                        partialResponse += chunk;
-
-                        // Look for complete responses in the accumulated text
-                        if (partialResponse.includes('\n')) {
-                            resolve(partialResponse);
-                            break;
-                        }
-                    }
-                } catch (error) {
-                    console.error('Streaming error:', error);
-                    resolve(`I understand you're asking about "${userInput}". While I'm having trouble connecting right now 🧠, I can still help with questions about Rudra's skills, projects, or contact info. Try asking one of those!`);
-                }
-            } else if (type === 'error') {
-                console.warn('Worker error:', error);
-                resolve("I'm sorry, something went wrong. Please try again.");
+            } else {
+                console.warn('API call failed via worker, using fallback:', error);
+                resolve(`I understand you're asking about "${userInput}". While I'm having trouble connecting to my brain right now 🧠, I can still help with questions about Rudra's skills, projects, or contact info. Try asking one of those!`);
             }
 
-            // Terminate the worker
+            // Terminate the worker once it's done
             worker.terminate();
         };
 
@@ -190,7 +149,7 @@ async function getBotResponse(userInput, chatHistory) {
             worker.terminate();
         };
 
-        // Send the user input and knowledge base to the worker
+        // Send the user input and knowledge base to the worker to start the API call
         worker.postMessage({ userInput, chatHistory, knowledgeBase, localFallbackResponses });
     });
 }
