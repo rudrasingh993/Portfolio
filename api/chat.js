@@ -108,7 +108,7 @@ Your answer:`;
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody),
             // Add a timeout for the fetch request to prevent hanging
-            signal: AbortSignal.timeout(10000) // 10 seconds timeout
+            signal: AbortController.timeout(10000).signal // 10 seconds timeout
         });
 
         if (!apiResponse.ok) {
