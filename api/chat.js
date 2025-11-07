@@ -131,15 +131,40 @@ Your answer:`;
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=${apiKey}&alt=sse`;
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
 
-        const apiResponse = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody),
-            // Add a timeout for the fetch request to prevent hanging
-            signal: controller.signal
-        });
+        try {
+            const apiResponse = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!apiResponse.ok) {
+                const errorData = await apiResponse.json().catch(() => ({}));
+                const errorMsg = errorData.error?.message || 'Unknown API error';
+                console.error(`Gemini API returned non-OK status: ${apiResponse.status}, Message: ${errorMsg}, Details:`, errorData);
+                return new Response(JSON.stringify({ 
+                    error: `API Error (${apiResponse.status}): ${errorMsg}`,
+                    suggestions: generateContextualSuggestions(userInput)
+                }), { status: apiResponse.status });
+            }
+
+            return new Response(apiResponse.body, { 
+                headers: { 'Content-Type': 'text/event-stream' }
+            });
+        } catch (fetchError) {
+            if (fetchError.name === 'AbortError') {
+                return new Response(JSON.stringify({ 
+                    error: 'Request timeout',
+                    suggestions: generateContextualSuggestions(userInput)
+                }), { status: 408 });
+            }
+            throw fetchError;
+        }
 
         if (!apiResponse.ok) {
             const errorData = await apiResponse.json().catch(() => ({}));
