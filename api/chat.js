@@ -59,6 +59,27 @@ export default async function handler(req, res) {
         }), { status: 500 });
     }
 
+    // Expanded list of models for chat, ordered from most preferred to least.
+    // This provides fallbacks if one model is unavailable or rate-limited.
+    const models = [
+        'gemini-1.5-flash-latest',     // Alias for the latest flash model (fast and cost-effective)
+        'gemini-pro-latest',           // Alias for the latest pro model (more powerful)
+        'gemini-2.0-flash',
+        'gemini-2.5-flash-lite',
+        'gemini-2.0-flash-lite',
+        'gemini-2.0-flash-live',
+        'gemini-2.5-flash-live',
+        'gemini-2.0-flash-exp',
+        'learnlm-2.0-flash-experimental'
+    ];
+
+    // It's generally best to stick with 'v1beta' for streaming features.
+    const apiVersions = ['v1beta'];
+
+    let lastError = null;
+    let response = null;
+
+
     // Dynamically generate context from the provided knowledge base
     const contextFromKB = knowledgeBase 
         ? `Here is a detailed knowledge base about Rudra. Use this information to answer questions about him. Do not mention that you are using a knowledge base. Just answer naturally:\n\n${JSON.stringify(knowledgeBase, null, 2)}`
@@ -126,66 +147,58 @@ Your answer:`;
         contents: [{ parts: [{ text: prompt }] }],
     };
 
-    try {
-        // Use the streaming endpoint
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=${apiKey}&alt=sse`;
+    for (const version of apiVersions) {
+        for (const model of models) {
+            const API_URL = `https://generativelanguage.googleapis.com/${version}/models/${model}:streamGenerateContent?key=${apiKey}&alt=sse`;
+            console.log(`Attempting to call model: ${model} with API version: ${version}`);
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15-second timeout
 
-        try {
-            const apiResponse = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody),
-                signal: controller.signal
-            });
+            try {
+                const apiResponse = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody),
+                    signal: controller.signal
+                });
 
-            clearTimeout(timeoutId);
+                clearTimeout(timeoutId);
 
-            if (!apiResponse.ok) {
+                if (apiResponse.ok) {
+                    // If successful, return the streaming response immediately
+                    return new Response(apiResponse.body, {
+                        headers: { 'Content-Type': 'text/event-stream' }
+                    });
+                }
+
+                // If not OK, store the error and try the next model
                 const errorData = await apiResponse.json().catch(() => ({}));
-                const errorMsg = errorData.error?.message || 'Unknown API error';
-                console.error(`Gemini API returned non-OK status: ${apiResponse.status}, Message: ${errorMsg}, Details:`, errorData);
-                return new Response(JSON.stringify({ 
-                    error: `API Error (${apiResponse.status}): ${errorMsg}`,
-                    suggestions: generateContextualSuggestions(userInput)
-                }), { status: apiResponse.status });
+                lastError = {
+                    status: apiResponse.status,
+                    message: errorData.error?.message || `Failed to call ${model}`,
+                    model,
+                    version
+                };
+                console.warn(`Failed with model ${model} (${version}): ${lastError.message}`);
+
+            } catch (fetchError) {
+                clearTimeout(timeoutId);
+                lastError = {
+                    status: fetchError.name === 'AbortError' ? 408 : 500,
+                    message: fetchError.name === 'AbortError' ? 'Request timed out' : fetchError.message,
+                    model,
+                    version
+                };
+                console.warn(`Error with model ${model} (${version}): ${lastError.message}`);
             }
-
-            return new Response(apiResponse.body, { 
-                headers: { 'Content-Type': 'text/event-stream' }
-            });
-        } catch (fetchError) {
-            if (fetchError.name === 'AbortError') {
-                return new Response(JSON.stringify({ 
-                    error: 'Request timeout',
-                    suggestions: generateContextualSuggestions(userInput)
-                }), { status: 408 });
-            }
-            throw fetchError;
         }
-
-        if (!apiResponse.ok) {
-            const errorData = await apiResponse.json().catch(() => ({}));
-            const errorMsg = errorData.error?.message || 'Unknown API error';
-            console.error(`Gemini API returned non-OK status: ${apiResponse.status}, Message: ${errorMsg}, Details:`, errorData);
-            // Return error with contextual suggestions
-            return new Response(JSON.stringify({ 
-                error: `API Error (${apiResponse.status}): ${errorMsg}`,
-                suggestions: generateContextualSuggestions(userInput)
-            }), { status: apiResponse.status });
-        }
-
-        // The response from Gemini with alt=sse is already a stream. We can pipe it directly.
-        return new Response(apiResponse.body, { headers: { 'Content-Type': 'text/event-stream' } });
-
-    } catch (error) {
-        console.error('Error calling Gemini API:', error);
-        // Return error with default suggestions
-        return new Response(JSON.stringify({ 
-            error: 'AI service is currently unavailable.',
-            suggestions: SUGGESTIONS
-        }), { status: 503 });
     }
+
+    // If all models fail, return the last recorded error
+    console.error('All Gemini models failed. Last error:', lastError);
+    return new Response(JSON.stringify({
+        error: `AI service is unavailable. Last error: ${lastError.message}`,
+        suggestions: generateContextualSuggestions(userInput)
+    }), { status: lastError.status || 500 });
 }
