@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initTypingAnimation();
     initSkillBars();
     initChatbot();
+    initProjectModals();
 });
 
 // Fluid Intro Interactive Features
@@ -140,6 +141,77 @@ function initFluidIntro() {
     }
 }
 
+// Project Spotlight Modal
+function initProjectModals() {
+    const projectCards = document.querySelectorAll('.project-card');
+    const modal = document.getElementById('projectModal');
+    const overlay = document.getElementById('projectModalOverlay');
+    const closeBtn = document.getElementById('modalCloseBtn');
+
+    if (!modal || !overlay || !closeBtn) return;
+
+    projectCards.forEach(card => {
+        const viewDetailsBtn = card.querySelector('.project-action-btn');
+        if (viewDetailsBtn) {
+            viewDetailsBtn.addEventListener('click', () => {
+                populateAndShowModal(card);
+            });
+        }
+    });
+
+    function populateAndShowModal(card) {
+        // Get data from card
+        const title = card.dataset.title;
+        const description = card.dataset.description;
+        const image = card.dataset.image;
+        const tech = card.dataset.tech.split(',');
+        const github = card.dataset.github;
+        const live = card.dataset.live;
+
+        // Get modal elements
+        const modalImage = document.getElementById('modalProjectImage');
+        const modalTitle = document.getElementById('modalProjectTitle');
+        const modalTech = document.getElementById('modalProjectTech');
+        const modalDescription = document.getElementById('modalProjectDescription');
+        const modalGithubLink = document.getElementById('modalGithubLink');
+        const modalLiveLink = document.getElementById('modalLiveLink');
+
+        // Populate modal
+        modalImage.src = image;
+        modalImage.alt = title;
+        modalTitle.textContent = title;
+        modalDescription.textContent = description;
+
+        modalTech.innerHTML = '';
+        tech.forEach(t => {
+            const techTag = document.createElement('span');
+            techTag.className = 'tech-tag';
+            techTag.innerHTML = `<span>${t}</span>`;
+            modalTech.appendChild(techTag);
+        });
+
+        modalGithubLink.href = github;
+        modalLiveLink.href = live;
+
+        // Show/hide links based on availability
+        modalGithubLink.style.display = github === '#' ? 'none' : 'flex';
+        modalLiveLink.style.display = live === '#' ? 'none' : 'flex';
+
+        // Show modal
+        modal.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+}
 // Enhanced Theme Toggle with Smooth Transitions
 function initTheme() {
     const themeToggle = document.getElementById('themeToggle');
@@ -638,11 +710,101 @@ resizeObserver.observe(document.documentElement);
 console.log('%c🏛️ Welcome to my  Portfolio!', 
     'color: #8b6f47; font-size: 24px; font-weight: 600; font-family: "Playfair Display", serif;');
 
+const knowledgeBase = {
+    "name": "Rudra Pratap Singh",
+    "hello|hi": "Hello there! I'm Rudra's digital assistant. Feel free to ask me anything about his work and skills.",
+    "who are you|what are you": "I am Rudra's portfolio chatbot. I can answer questions about Rudra Pratap Singh: his skills, projects, goals, devices, and preferences.",
+    "who is rudra|who's rudra": "Rudra Pratap Singh is a passionate AI/ML enthusiast and creative web developer building portfolio projects, games, and AI features. He's focused on learning and making practical projects for his B.Tech / AI career path.",
+    "email": "rudrasingh14513@gmail.com",
+    "contact|how to contact": "The best way to contact Rudra is via the contact form on his site or by email at rudrasingh14513@gmail.com.",
+  
+    // Skills & technical profile
+    "skills|what are your skills": "Rudra is a versatile developer with a strong foundation in both frontend and backend technologies. His toolkit includes React, Next.js, Node.js, Python, FastAPI, and various databases. He's also proficient in design tools like Figma. For a detailed list, check out the 'Skills' section!",
+    "technical craft": "Rudra writes clean, maintainable code and prefers minimal, thoughtful design — 'less is more'.",
+  
+    // Projects & portfolio
+    "what is this website": "This is Rudra Pratap Singh's personal portfolio showcasing his projects, skills, and creative journey.",
+    "projects|what are the projects": "Rudra is building projects including games, AI-powered chatbots, e-commerce demos, and portfolio showcase apps. Several items are in progress and will be posted soon.",
+    "portfolio features": "Features planned: AI chatbot, special admin login, showcase of games and e-commerce projects, and polished UI/UX for each project.",
+  
+    // Career & education
+    "education status": "Rudra completed 12th grade studies and took a gap year (2024–2025) to focus on skills, exam prep (JEE, BITSAT, VITJEE), and portfolio development.",
+    "career goals": "Rudra aims to pursue AI/ML in B.Tech, build an AI/ML portfolio, learn model-building, and ultimately work towards building his own LLM and a semiconductor plant in India.",
+    "roadmap": "Interested in AI/ML and Data Science — focus on math, Python, ML libraries, project-based portfolio, internships, and building demonstrable systems.",
+  
+    // Devices / hardware / audio
+    "devices": "Primary phone: Realme Narzo 60 Pro. Also owns Samsung Galaxy J7 Prime (SM-G610F/DD, rooted). Audio gear: Sony WH-1000XM5 and Audio-Technica M50xBT2.",
+    "headphones": "Rudra prefers high-quality sound with deep bass; owns Sony WH-1000XM5 and Audio-Technica M50xBT2.",
+  
+    // Personal & preferences
+    "name prefer": "Rudra (Rudra Pratap Singh)",
+    "diet": "Vegetarian.",
+    "fitness level": "Beginner in gym training; prefers a mix of machines and free weights.",
+    "gym schedule": "Usually goes to the gym 4:00 PM to 5:30 PM on all days except Sundays and Wednesdays.",
+    "supplements": "Started taking creatine on 2025-02-21, taken pre-workout.",
+    "body stats": "Height: 6'2\". Weight: ~87 kg (last recorded 2024-11-29). On a calorie-deficit diet for weight loss.",
+    "beard": "Patchy beard growth that curls; prefers to keep beard short.",
+    "age & birthday": "Birthday: December 17. (Age recorded in convo: 18 on 2024-11-29.)",
+  
+    // Skin & grooming
+    "skin type": "Oily, sweaty skin with concerns: tan, acne spots, occasional pimples, persistently oily.",
+    "skincare products": "Uses Mamaearth Ubtan Face Wash, Mamaearth Vitamin C Daily Glow Face Serum, Mamaearth Tea Tree Face Serum, Rose Water, Lakme 50 PA+++ Gel Light Sunscreen. Also has Nivea moisturizer cream and a Beardo activated charcoal peel-off mask.",
+    "skincare preferences": "Prefers budget-friendly options. Likes Minimalist 2% Salicylic Acid Face Wash and is considering Minimalist B5 Moisturizer.",
+    
+    // UX / product preferences
+    "product preferences": "Budget-friendly skincare; high-quality audio with deep bass; accessible, practical web projects.",
+    
+    // Development preferences & projects details
+    "game target audience": "Teens.",
+    "game concept": "Web-based simulation/adventure game with a funny theme that teaches basic Python programming.",
+    "captcha system": "Developing a CAPTCHA that presents calculus and trigonometry questions and shows a new question after successful completion.",
+    "web goals": "Wants portfolio to auto-update on new GitHub commits and be hosted on Vercel. Uses modern web stacks and cares about clean UI and OG tags.",
+    
+    // Tools & coding notes encountered in convo
+    "recent technical issues": "Examples discussed: Gemini CLI node engine error (requires Node >=20), MusicKit CSP frame-ancestors issue, Vercel output directory config errors.",
+    "tech interests": "AI/ML model building, LLMs, portfolio sites, game dev, and learning dev tooling.",
+    
+    // Social & content creation
+    "social goals": "Wants to start Instagram and YouTube, learn photo/video editing, and build a presence while making technical content.",
+    "video editing": "Looking for good, free, simple video editing platforms for personal use.",
+    
+    // Fallbacks & fun bits
+    "tell me a joke": "Why don't scientists trust atoms? Because they make up everything!",
+    "meaning of life": "Rudra believes in living a life of purpose, passion, and continuous learning.",
+    
+    // Default fallback
+    "default": "I'm sorry—I can only answer questions about Rudra Pratap Singh's portfolio and preferences. If you want to update anything, tell me what to change."
+};
+
+async function getBotResponse(userInput, chatHistory) {
+    // All logic, including local search and API calls, is now offloaded to the worker
+    // to prevent blocking the main thread. This keeps the UI and animations smooth.
+    return new Promise((resolve, reject) => {
+        // We assume 'chat-worker.js' exists and is configured correctly.
+        const worker = new Worker('chat-worker.js');
+
+        // The worker will now return a stream for AI responses, or a direct object for local ones.
+        worker.onmessage = (event) => {
+            resolve(event.data);
+            worker.terminate();
+        };
+
+        worker.onerror = (error) => {
+            console.error('Error in chat worker:', error);
+            reject(new Error("Worker error: " + error.message));
+            worker.terminate();
+        };
+
+        // Send the user input and history to the worker to start processing
+        worker.postMessage({ userInput, chatHistory, knowledgeBase });
+    });
+}
 // Chatbot functionality
 function initChatbot() {
     const chatIcon = document.getElementById('chatIcon');
     const chatWindow = document.getElementById('chatWindow');
     const chatClose = document.getElementById('chatClose');
+    const chatClear = document.getElementById('chatClear');
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
     const chatSend = document.getElementById('chatSend');
@@ -678,12 +840,54 @@ function initChatbot() {
         }
     }
 
+    // Display suggested questions as chips in the chat flow
+    function showSuggestions(suggestions) {
+        // Remove any existing suggestion chips first
+        const existingSuggestions = document.querySelector('.message-suggestions');
+        if (existingSuggestions) {
+            existingSuggestions.remove();
+        }
+
+        if (!suggestions || suggestions.length === 0) return;
+
+        const suggestionsContainer = document.createElement('div');
+        suggestionsContainer.className = 'message-suggestions';
+
+        suggestions.forEach(suggestionText => {
+            const chip = document.createElement('button');
+            chip.className = 'suggestion-chip';
+            chip.textContent = suggestionText;
+            chip.addEventListener('click', () => {
+                chatInput.value = suggestionText;
+                sendMessage();
+            });
+            suggestionsContainer.appendChild(chip);
+        });
+
+        chatMessages.appendChild(suggestionsContainer);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
     chatIcon.addEventListener('click', () => {
         chatWindow.classList.toggle('active');
     });
 
     chatClose.addEventListener('click', () => {
         chatWindow.classList.remove('active');
+    });
+
+    chatClear.addEventListener('click', () => {
+        chatHistory = [];
+        saveHistory();
+        chatMessages.innerHTML = '';
+        // Add and save the initial bot message after clearing
+        appendMessage('Hello! How can I help you?', 'bot-message');
+        // Show default suggestions after clearing
+        showSuggestions([
+            "What are his main skills?",
+            "Tell me about a project.",
+            "How do I contact him?"
+        ]);
     });
 
     chatSend.addEventListener('click', sendMessage);
@@ -697,7 +901,12 @@ function initChatbot() {
         const userInput = chatInput.value.trim();
         if (userInput === '') return;
 
+        // Remove old suggestions when a new message is sent
+        const existingSuggestions = document.querySelector('.message-suggestions');
+        if (existingSuggestions) existingSuggestions.remove();
+
         // Disable input while processing
+
         chatInput.disabled = true;
         chatSend.disabled = true;
 
@@ -708,36 +917,167 @@ function initChatbot() {
         const loadingMessage = appendMessage('Thinking...', 'bot-message loading-message', false);
 
         try {
-            const botResponse = await getBotResponse(userInput);
-            // Remove loading message and add actual response
-            loadingMessage.remove();
-            appendMessage(botResponse, 'bot-message'); // This will also save the bot response
+            const workerResponse = await getBotResponse(userInput, chatHistory);
+
+            if (workerResponse.type === 'local') {
+                // Handle instant local response
+                loadingMessage.remove();
+                appendMessage(workerResponse.response, 'bot-message');
+                showSuggestions(workerResponse.suggestions);
+            } else if (workerResponse.type === 'stream') {
+                // Handle streaming AI response
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userInput, chatHistory, knowledgeBase }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                // Create a new message element to stream into
+                loadingMessage.remove();
+                const botMessageContainer = appendMessage('', 'bot-message', false);
+                const botMessageElement = botMessageContainer.querySelector('.message');
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullResponseText = '';
+                let suggestionsText = '';
+                let suggestionsFound = false;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    let chunk = decoder.decode(value, { stream: true });
+
+                    if (suggestionsFound) {
+                        suggestionsText += chunk;
+                    } else if (chunk.includes('[SUGGESTIONS]')) {
+                        suggestionsFound = true;
+                        const parts = chunk.split('[SUGGESTIONS]');
+                        chunk = parts[0];
+                        suggestionsText = parts[1] || '';
+                    }
+
+                    if (!suggestionsFound) {
+                        fullResponseText += chunk;
+                        // This is where we parse and render the streaming text
+                        renderMessageContent(botMessageElement, fullResponseText);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }
+
+                // Finalize message content and save
+                renderMessageContent(botMessageElement, fullResponseText, true); // Final render with highlighting
+                chatHistory.push({ text: fullResponseText, className: 'bot-message' });
+                saveHistory();
+                showSuggestions(suggestionsText.split('|').filter(s => s.trim()));
+            }
         } catch (error) {
             console.error('Chatbot Error:', error);
             loadingMessage.remove();
             appendMessage("I'm sorry, something went wrong. Please try again.", 'bot-message');
         } finally {
-            // Re-enable input
-            chatInput.disabled = false; 
+            chatInput.disabled = false;
             chatSend.disabled = false;
             chatInput.focus();
         }
     }
 
     function appendMessage(text, className, shouldSave = true) {
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'message-container';
         const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        // Handle multiple classes if provided
-        if (className) {
-            const classes = className.split(' ');
-            classes.forEach(cls => {
-                if (cls.trim()) {
-                    messageElement.classList.add(cls.trim());
-                }
-            });
-        }
+        messageElement.className = `message ${className || ''}`;
+
+        // Regex to find markdown-style code blocks
+        const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
+        let lastIndex = 0;
+        let match;
+
+        // Initial render. For streaming, this will be updated by renderMessageContent
         messageElement.textContent = text;
-        chatMessages.appendChild(messageElement);
+        messageContainer.appendChild(messageElement);
+
+        // Check if the message is from the bot and contains a code block
+        if (className.includes('bot-message') && codeBlockRegex.test(text)) {
+            // Reset regex for execution
+            codeBlockRegex.lastIndex = 0; 
+
+            while ((match = codeBlockRegex.exec(text)) !== null) {
+                // Add text before the code block
+                if (match.index > lastIndex) {
+                    const textNode = document.createElement('p');
+                    textNode.textContent = text.substring(lastIndex, match.index);
+                    messageElement.appendChild(textNode);
+                }
+
+                const [fullMatch, language, code] = match;
+                
+                // Create container for the code block
+                const codeContainer = document.createElement('div');
+                codeContainer.className = 'code-block-container';
+
+                const pre = document.createElement('pre');
+                const codeEl = document.createElement('code');
+                if (language) {
+                    codeEl.className = `language-${language}`;
+                }
+                codeEl.textContent = code.trim();
+                pre.appendChild(codeEl);
+
+                // Create copy button
+                const copyButton = document.createElement('button');
+                copyButton.className = 'copy-code-btn';
+                copyButton.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                copyButton.addEventListener('click', () => {
+                    navigator.clipboard.writeText(code.trim()).then(() => {
+                        copyButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        setTimeout(() => {
+                            copyButton.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                        }, 2000);
+                    });
+                });
+
+                codeContainer.appendChild(copyButton);
+                codeContainer.appendChild(pre);
+                messageElement.appendChild(codeContainer);
+
+                lastIndex = codeBlockRegex.lastIndex;
+            }
+
+            // Add any remaining text after the last code block
+            if (lastIndex < text.length) {
+                const textNode = document.createElement('p');
+                textNode.textContent = text.substring(lastIndex);
+                messageElement.appendChild(textNode);
+            }
+        } else {
+            // If no code block, just set the text content
+            messageElement.textContent = text;
+        }
+
+        if (className.includes('bot-message') && !className.includes('loading-message')) {
+            const copyButton = document.createElement('button');
+            copyButton.className = 'copy-response-btn';
+            copyButton.innerHTML = '<i class="fas fa-copy"></i> Copy';
+            copyButton.title = 'Copy response text';
+            copyButton.addEventListener('click', () => {
+                // We use the raw 'text' variable to copy content even from code blocks
+                navigator.clipboard.writeText(text).then(() => {
+                    copyButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        copyButton.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                    }, 2000);
+                });
+            });
+            messageContainer.appendChild(copyButton);
+        }
+
+        chatMessages.appendChild(messageContainer);
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
         // Add to history and save, if required
@@ -746,11 +1086,82 @@ function initChatbot() {
             saveHistory();
         }
 
-        return messageElement;
+        return messageContainer; // Return the container so it can be removed if it's a loading message
+    }
+
+    /**
+     * Renders message content, parsing for code blocks.
+     * Can be called repeatedly for streaming text.
+     * @param {HTMLElement} messageElement - The .message element to render into.
+     * @param {string} text - The full text to render.
+     * @param {boolean} isFinal - If true, applies final touches like syntax highlighting.
+     */
+    function renderMessageContent(messageElement, text, isFinal = false) {
+        messageElement.innerHTML = ''; // Clear previous content
+
+        const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
+        let lastIndex = 0;
+        let match;
+
+        // Use a temporary regex object for each run
+        const regex = new RegExp(codeBlockRegex);
+
+        while ((match = regex.exec(text)) !== null) {
+            // Add text before the code block
+            if (match.index > lastIndex) {
+                const textNode = document.createElement('p');
+                textNode.textContent = text.substring(lastIndex, match.index);
+                messageElement.appendChild(textNode);
+            }
+
+            const [fullMatch, language, code] = match;
+            
+            const pre = document.createElement('pre');
+            // Add the language class for Prism.js. Normalize common names.
+            const langClass = language.toLowerCase() || 'none';
+            pre.className = `language-${langClass}`;
+
+            const codeEl = document.createElement('code');
+            codeEl.textContent = code.trim();
+            pre.appendChild(codeEl);
+
+            // On the final render, apply syntax highlighting
+            if (isFinal && window.Prism) {
+                Prism.highlightElement(codeEl);
+            }
+
+            // The copy button is now part of the <pre> element for Prism Toolbar
+            if (isFinal) {
+                pre.setAttribute('data-prismjs-copy', 'Copy');
+                pre.setAttribute('data-prismjs-copy-success', 'Copied!');
+            }
+
+            messageElement.appendChild(pre);
+
+            lastIndex = regex.lastIndex;
+        }
+
+        // Add any remaining text after the last code block
+        if (lastIndex < text.length) {
+            const textNode = document.createElement('p');
+            textNode.textContent = text.substring(lastIndex);
+            messageElement.appendChild(textNode);
+        }
+
+        // If the message is empty (e.g., at the start of a stream), add a cursor
+        if (text.length === 0) {
+            const cursor = document.createElement('span');
+            cursor.className = 'typing-cursor';
+            messageElement.appendChild(cursor);
+        }
     }
 
     // Load the chat history when the chatbot is initialized
-    loadHistory();
+    loadHistory(); 
+    // Show default suggestions on initial load if history is empty
+    if (chatHistory.length <= 1) {
+        showSuggestions(["What are his main skills?", "Tell me about a project.", "How do I contact him?"]);
+    }
 }
 
 

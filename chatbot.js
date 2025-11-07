@@ -120,7 +120,7 @@ function findLocalResponse(userInput) {
     return null; // No local response found
 }
 
-async function getBotResponse(userInput) {
+async function getBotResponse(userInput, chatHistory) {
     // All logic, including local search and API calls, is now offloaded to the worker
     // to prevent blocking the main thread. This keeps the UI and animations smooth.
     return new Promise((resolve) => {
@@ -150,7 +150,7 @@ async function getBotResponse(userInput) {
         };
 
         // Send the user input and knowledge base to the worker to start the API call
-        worker.postMessage({ userInput, knowledgeBase, localFallbackResponses });
+        worker.postMessage({ userInput, chatHistory, knowledgeBase, localFallbackResponses });
     });
 }
 

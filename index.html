@@ -9,6 +9,9 @@
     <meta name="theme-color" content="#fdfcfb">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <!-- Prism.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css">
 <!-- Open Graph Tags -->
 <meta property="og:title" content="Rudra Pratap Singh Portfolio & Projects" />
 <meta property="og:description" content="Explore the professional portfolio of Rudra Pratap Singh, showcasing web development projects with creative designs." />
@@ -332,35 +335,65 @@
                 <p class="section-subtitle">Crafted with passion and precision</p>
             </div>
             <div class="projects-grid">
-                <div class="project-card fade-in">
+                <!-- Project 1 -->
+                <div class="project-card fade-in" 
+                     data-title="AI-Powered Chatbot"
+                     data-description="An intelligent, conversational AI chatbot integrated into this very portfolio. It's built with the Gemini API and features streaming responses, contextual suggestions, and a long-term memory, all running efficiently via a web worker to ensure a smooth user experience."
+                     data-image="chatbot-project.png"
+                     data-tech="JavaScript,Vercel API,Gemini AI,CSS"
+                     data-github="https://github.com/rudrasingh993/Portfolio-Website"
+                     data-live="#">
+                    <div class="project-image">
+                        <img src="chatbot-project.png" alt="AI-Powered Chatbot Project">
+                        <div class="project-overlay">
+                            <div class="project-links">
+                                <button class="project-action-btn">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <h3 class="project-title">AI Portfolio Chatbot</h3>
+                        <p class="project-description">
+                            An intelligent, conversational AI chatbot integrated into this very portfolio.
+                        </p>
+                        <div class="project-tech">
+                            <span class="tech-tag"><span>JavaScript</span></span>
+                            <span class="tech-tag"><span>Gemini AI</span></span>
+                            <span class="tech-tag"><span>Vercel API</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card fade-in"
+                     data-title="Coming Soon: E-Commerce Platform"
+                     data-description="A full-featured e-commerce platform is currently under development. It will feature a modern design, product management, a secure Stripe-powered checkout process, and a complete user authentication system. Stay tuned for updates!"
+                     data-image="pngwing.com.png"
+                     data-tech="React,Node.js,MongoDB,Stripe"
+                     data-github="#"
+                     data-live="#">
                     <div class="project-image">
                         <img src="pngwing.com.png" alt="E-Commerce Platform">
                         <div class="project-overlay">
                             <div class="project-links">
-                                <a href="#" class="project-link" title="View Code">
-                                    <i class="fab fa-github"></i>
-                                </a>
-                                <a href="#" class="project-link" title="Live Demo">
-                                    <i class="fas fa-external-link-alt"></i>
-                                </a>
+                                <button class="project-action-btn">View Details</button>
                             </div>
                         </div>
                     </div>
                     <div class="project-info">
                         <h3 class="project-title">Coming Soon</h3>
                         <p class="project-description">
-                        
+                            A full-featured e-commerce platform is currently under development.
                         </p>
                         <div class="project-tech">
                             <span class="tech-tag"><span>React</span></span>
                             <span class="tech-tag"><span>Node.js</span></span>
-                            <span class="tech-tag"><span>MongoDB</span></span>
                             <span class="tech-tag"><span>Stripe</span></span>
                         </div>
                     </div>
                 </div>
 
-            <!-- <div class="project-card fade-in">
+                <!-- <div class="project-card fade-in">
                     <div class="project-image">
                         <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=500&h=300&fit=crop" alt="Task Management App">
                         <div class="project-overlay">
@@ -386,10 +419,10 @@
                             <span class="tech-tag"><span>Express</span></span>
                             <span class="tech-tag"><span>PostgreSQL</span></span>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
 
-                <div class="project-card fade-in">
+                <!-- <div class="project-card fade-in">
                     <div class="project-image">
                         <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&h=300&fit=crop" alt="Analytics Dashboard">
                         <div class="project-overlay">
@@ -416,9 +449,9 @@
                             <span class="tech-tag"><span>FastAPI</span></span>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
-                <div class="project-card fade-in">
+                <!-- <div class="project-card fade-in">
                     <div class="project-image">
                         <img src="https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=500&h=300&fit=crop" alt="Mobile App">
                         <div class="project-overlay">
@@ -443,9 +476,8 @@
                             <span class="tech-tag"><span>Firebase</span></span>
                             <span class="tech-tag"><span>Redux</span></span>
                             <span class="tech-tag"><span>Chart.js</span></span>
-                        </div>-->
-                    </div>
-                </div>
+                        </div>
+                </div> -->
             </div>
         </div>
     </section>
@@ -646,10 +678,17 @@ window.si = window.si || function () { (window.siq = window.siq || []).push(argu
     </div>
     <div class="chat-window" id="chatWindow">
         <div class="chat-header">
-            <div class="chat-title">AI Assistant</div>
-            <button class="chat-close" id="chatClose">&times;</button>
+            <h4 class="chat-title">RudraBot</h4>
+            <div class="chat-header-buttons">
+                <button id="chatClear" class="chat-header-btn" title="Clear History">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
+                </button>
+                <button id="chatClose" class="chat-header-btn" title="Close Chat">&times;</button>
+            </div>
         </div>
         <div class="chat-messages" id="chatMessages">
+        </div>
+        <div class="chat-suggestions" id="chatSuggestions">
         </div>
         <div class="chat-input-container">
             <input type="text" id="chatInput" placeholder="Ask me something...">
@@ -657,6 +696,34 @@ window.si = window.si || function () { (window.siq = window.siq || []).push(argu
         </div>
     </div>
 </div>
-<script src="chatbot.js" defer></script>
+
+<!-- Project Spotlight Modal -->
+<div class="modal-overlay" id="projectModalOverlay"></div>
+<div class="modal" id="projectModal">
+    <button class="modal-close" id="modalCloseBtn">&times;</button>
+    <div class="modal-content">
+        <div class="modal-image">
+            <img src="" alt="Project Image" id="modalProjectImage">
+        </div>
+        <div class="modal-info">
+            <h3 class="modal-title" id="modalProjectTitle"></h3>
+            <div class="modal-tech" id="modalProjectTech"></div>
+            <p class="modal-description" id="modalProjectDescription"></p>
+            <div class="modal-links">
+                <a href="#" id="modalGithubLink" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-github"></i> View Code
+                </a>
+                <a href="#" id="modalLiveLink" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-external-link-alt"></i> Live Demo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Prism.js Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
 </body>
 </html>

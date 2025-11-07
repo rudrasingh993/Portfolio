@@ -1360,17 +1360,13 @@ section {
 .project-card:hover .project-overlay {
     opacity: 0.92;
 }
-
 .project-links {
     display: flex;
     gap: var(--space-md);
     transform: translateY(8px);
     transition: var(--transition-elegant);
 }
-.project-card:hover .project-links {
-    transform: translateY(0);
-}
-.project-link {
+.project-action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1378,14 +1374,20 @@ section {
     height: 48px;
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
+    border: none;
+    border-radius: var(--border-radius);
     color: white;
     text-decoration: none;
-    font-size: 1.125rem;
+    font-size: 1rem;
+    font-weight: 500;
+    font-family: var(--font-body);
+    padding: 0 var(--space-lg);
     transition: var(--transition-smooth);
 }
-.project-link:hover {
+.project-card:hover .project-links {
+    transform: translateY(0);
+}
+.project-action-btn:hover {
     background: rgba(255, 255, 255, 0.25);
     transform: scale(1.05);
     border-color: rgba(255, 255, 255, 0.3);
@@ -2270,17 +2272,46 @@ section {
     color: var(--accent-primary);
 }
 
-.chat-close {
+/* Container for header buttons */
+.chat-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Style for buttons in the chat header */
+.chat-header-btn {
     background: none;
     border: none;
     font-size: 1.5rem;
     color: var(--text-muted);
-    cursor: pointer;
+    color: var(--text-secondary);
     transition: var(--transition-smooth);
+    font-size: 24px;
+    line-height: 1;
+    padding: 0 5px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
-.chat-close:hover {
+.chat-header-btn:hover {
+    opacity: 1;
     color: var(--text-primary);
+}
+
+/* Specific styling for the close button text */
+#chatClose {
+    font-size: 30px;
+    font-weight: 400;
+}
+
+/* Ensure the clear button's SVG icon inherits color */
+#chatClear svg {
+    fill: var(--text-secondary);
 }
 
 .chat-messages {
@@ -2290,6 +2321,12 @@ section {
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
+}
+
+.message-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
 }
 
 .message {
@@ -2311,6 +2348,92 @@ section {
     color: var(--text-primary);
     align-self: flex-start;
     border-bottom-left-radius: 4px;
+}
+
+/* Typing cursor for streaming response */
+.bot-message .typing-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1rem;
+    background: var(--accent-primary);
+    animation: blink 1s steps(5, start) infinite;
+}
+
+/* General copy button for the entire bot response */
+.copy-response-btn {
+    align-self: flex-start;
+    background: none;
+    border: 1px solid var(--border-soft);
+    color: var(--text-muted);
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: var(--space-xs);
+    margin-left: var(--space-sm);
+    opacity: 0;
+    transition: all var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Show the button on hover of the message container */
+.message-container:hover .copy-response-btn {
+    opacity: 0.8;
+}
+
+.copy-response-btn:hover {
+    opacity: 1;
+    background: var(--bg-accent);
+    border-color: var(--border-medium);
+    color: var(--text-primary);
+}
+
+/* Container for suggestion chips within the message flow */
+.message-suggestions {
+    align-self: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding-left: 10px; /* Align with bot message indentation */
+    margin-top: -5px; /* Reduce space after bot message */
+}
+
+.suggestion-chip {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: chip-fade-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.suggestion-chip:hover {
+    background: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: var(--shadow-soft);
+}
+
+/* Staggered animation for chips */
+.suggestion-chip:nth-child(2) { animation-delay: 0.1s; }
+.suggestion-chip:nth-child(3) { animation-delay: 0.2s; }
+.suggestion-chip:nth-child(4) { animation-delay: 0.3s; }
+
+@keyframes chip-fade-in {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .chat-input-container {
@@ -2376,4 +2499,244 @@ section {
     40% { content: '..'; }
     60%, 100% { content: '...'; }
 }
-        order: -1;
+
+@keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+/* --- Project Modal Styles --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-elegant);
+}
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-large);
+    z-index: 2001;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-elegant), transform var(--transition-elegant);
+    overflow: hidden;
+}
+.modal.active {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+}
+.modal-close {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    width: 40px;
+    height: 40px;
+    background: var(--bg-accent);
+    border: 1px solid var(--border-soft);
+    border-radius: 50%;
+    color: var(--text-primary);
+    font-size: 24px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: var(--transition-smooth);
+}
+.modal-close:hover {
+    background: var(--accent-primary);
+    color: white;
+    transform: rotate(90deg);
+}
+.modal-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100%;
+    max-height: 90vh;
+}
+.modal-image {
+    background: var(--bg-primary);
+    overflow: hidden;
+}
+.modal-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.modal-info {
+    padding: var(--space-2xl);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+.modal-title {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: var(--space-md);
+    line-height: 1.2;
+}
+.modal-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-lg);
+}
+.modal-description {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-xl);
+    flex-grow: 1;
+}
+.modal-links {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: auto;
+}
+.modal-links .btn {
+    flex-grow: 1;
+    justify-content: center;
+    gap: var(--space-sm);
+}
+.modal-links .btn i {
+    font-size: 1rem;
+}
+
+@media (max-width: 800px) {
+    .modal-content {
+        grid-template-columns: 1fr;
+    }
+    .modal-image {
+        height: 250px;
+    }
+    .modal-info {
+        padding: var(--space-xl);
+    }
+    .modal-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 500px) {
+    .modal-links {
+        flex-direction: column;
+    }
+    .modal-info {
+        padding: var(--space-lg);
+    }
+    .modal-title {
+        font-size: 1.75rem;
+    }
+}
+
+/* --- Prism.js Syntax Highlighting Theme --- */
+/* This theme is designed to match the website's aesthetic */
+
+.bot-message code[class*="language-"],
+.bot-message pre[class*="language-"] {
+	color: var(--text-secondary);
+	background: none;
+	font-family: 'Courier New', Courier, monospace;
+	font-size: 0.875rem;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.6;
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+.bot-message pre[class*="language-"] {
+	padding: var(--space-md);
+	margin: var(--space-sm) 0;
+	overflow: auto;
+	border-radius: var(--border-radius);
+	background: var(--bg-primary);
+    border: 1px solid var(--border-soft);
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: var(--text-light);
+    font-style: italic;
+}
+
+.token.punctuation {
+	color: var(--text-muted);
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: var(--accent-secondary);
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: var(--accent-tertiary);
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+	color: var(--text-secondary);
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+	color: var(--accent-primary);
+    font-weight: 600;
+}
+
+.token.function,
+.token.class-name {
+	color: var(--accent-gold);
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+	color: #e90;
+}
