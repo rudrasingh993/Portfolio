@@ -130,12 +130,15 @@ Your answer:`;
         // Use the streaming endpoint
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=${apiKey}&alt=sse`;
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+
         const apiResponse = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody),
             // Add a timeout for the fetch request to prevent hanging
-            signal: AbortController.timeout(10000).signal // 10 seconds timeout
+            signal: controller.signal
         });
 
         if (!apiResponse.ok) {
