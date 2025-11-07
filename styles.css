@@ -1319,10 +1319,7 @@ section {
     transition: var(--transition-elegant);
     box-shadow: var(--shadow-soft);
     position: relative;
-}
-.project-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-large);
+    cursor: pointer; /* Make it obvious the card is clickable on mobile */
 }
 
 .project-image {
@@ -1339,11 +1336,6 @@ section {
     filter: grayscale(20%) contrast(1.05);
 }
 
-.project-card:hover .project-image img {
-    transform: scale(1.05);
-    filter: grayscale(0%) contrast(1.1);
-}
-
 .project-overlay {
     position: absolute;
     top: 0;
@@ -1357,21 +1349,19 @@ section {
     justify-content: center;
     transition: var(--transition-elegant);
 }
-.project-card:hover .project-overlay {
-    opacity: 0.92;
-}
+
 .project-links {
     display: flex;
     gap: var(--space-md);
     transform: translateY(8px);
     transition: var(--transition-elegant);
 }
+
 .project-action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    padding: var(--space-md) var(--space-xl);
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     border: none;
@@ -1381,18 +1371,34 @@ section {
     font-size: 1rem;
     font-weight: 500;
     font-family: var(--font-body);
-    padding: 0 var(--space-lg);
     transition: var(--transition-smooth);
+    cursor: pointer;
 }
-.project-card:hover .project-links {
-    transform: translateY(0);
-}
+
 .project-action-btn:hover {
     background: rgba(255, 255, 255, 0.25);
     transform: scale(1.05);
-    border-color: rgba(255, 255, 255, 0.3);
 }
 
+/* Apply hover effects only on devices that can truly hover (like desktops) */
+@media (hover: hover) and (pointer: fine) {
+    .project-card:hover {
+        transform: translateY(-8px);
+        cursor: pointer; /* Keep pointer for desktop hover */
+        box-shadow: var(--shadow-large);
+    }
+    .project-card:hover .project-image img {
+        transform: scale(1.05);
+        filter: grayscale(0%) contrast(1.1);
+    }
+
+    .project-card:hover .project-overlay {
+        opacity: 0.92;
+    }
+    .project-card:hover .project-links {
+        transform: translateY(0);
+    }
+}
 .project-info {
     padding: var(--space-xl);
 }
@@ -2046,6 +2052,10 @@ section {
         grid-template-columns: 1fr;
     }
 
+    .project-card:hover {
+        transform: none;
+    }
+
     .skills-grid {
         grid-template-columns: 1fr;
     }
@@ -2538,13 +2548,13 @@ section {
     z-index: 2001;
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--transition-elegant), transform var(--transition-elegant);
-    overflow: hidden;
+    transition: opacity var(--transition-elegant), transform var(--transition-elegant);    
+    overflow-y: auto; /* Allow vertical scrolling for the whole modal */
 }
 .modal.active {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
-    pointer-events: auto;
+    pointer-events: auto;    
 }
 .modal-close {
     position: absolute;
@@ -2572,8 +2582,8 @@ section {
 .modal-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    height: 100%;
-    max-height: 90vh;
+    min-height: 100%; /* Use min-height to allow content to expand */
+    /* max-height: 90vh; Removed to let the parent .modal handle overall height and scrolling */
 }
 .modal-image {
     background: var(--bg-primary);
@@ -2628,6 +2638,7 @@ section {
     .modal-content {
         grid-template-columns: 1fr;
     }
+
     .modal-image {
         height: 250px;
     }

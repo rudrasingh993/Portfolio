@@ -1,6 +1,8 @@
+export const config = {
+    runtime: 'edge',
+};
+
 export default async function handler(req, res) {
-    // Vercel enables streaming by setting the runtime to 'edge'
-    // and using a specific response format. We will return a ReadableStream.
     if (req.method === 'OPTIONS') {
         return new Response(null, {
             status: 200,
@@ -17,10 +19,10 @@ export default async function handler(req, res) {
         return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { status: 405 });
     }
 
-    const { userInput, chatHistory, knowledgeBase } = req.body;
+    const { userInput, chatHistory, knowledgeBase } = await req.json();
 
     if (!userInput) {
-        return res.status(400).json({ error: 'User input is required' });
+        return new Response(JSON.stringify({ error: 'User input is required' }), { status: 400 });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -28,22 +30,6 @@ export default async function handler(req, res) {
         console.error('GEMINI_API_KEY is not set');
         return new Response(JSON.stringify({ error: 'API key not configured' }), { status: 500 });
     }
-
-    // Expanded list of models for chat, ordered from most preferred to least.
-    // This provides fallbacks if one model is unavailable or rate-limited.
-    const models = [
-        'gemini-flash-latest', // Alias for the latest flash model (fast and cost-effective)
-        'gemini-pro-latest',   // Alias for the latest pro model (more powerful)
-        'gemini-2.0-flash',
-        'gemini-2.5-flash-lite',
-        'gemini-2.0-flash-lite',
-        'gemini-2.0-flash-live',
-        'gemini-2.5-flash-live',
-        'gemini-2.0-flash-exp',
-        'learnlm-2.0-flash-experimental'
-    ];
-
-    const apiVersions = ['v1beta', 'v1'];
 
     // Dynamically generate context from the provided knowledge base
     const contextFromKB = knowledgeBase 
@@ -115,7 +101,7 @@ Your answer:`;
 
     try {
         // Use the streaming endpoint
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=${apiKey}`;
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=${apiKey}&alt=sse`;
 
         const apiResponse = await fetch(API_URL, {
             method: 'POST',
@@ -129,37 +115,8 @@ Your answer:`;
             throw new Error(`API Error (${apiResponse.status}): ${errorMsg}`);
         }
 
-        // Create a ReadableStream to send back to the client
-        const stream = new ReadableStream({
-            async start(controller) {
-                const reader = apiResponse.body.getReader();
-                const decoder = new TextDecoder();
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) {
-                        controller.close();
-                        break;
-                    }
-                    // The response from Gemini is a chunked JSON stream. We need to parse it.
-                    const chunk = decoder.decode(value, { stream: true });
-                    // The stream often returns multiple JSON objects in a single chunk, so we split them.
-                    const jsonChunks = chunk.replace(/^data: /gm, '').split('\n').filter(s => s.trim());
-
-                    for (const jsonChunk of jsonChunks) {
-                        try {
-                            const parsed = JSON.parse(jsonChunk);
-                            const text = parsed.candidates[0].content.parts[0].text;
-                            controller.enqueue(text);
-                        } catch (e) {
-                            // Ignore parsing errors which can happen with incomplete chunks
-                        }
-                    }
-                }
-            }
-        });
-
-        return new Response(stream, { headers: { 'Content-Type': 'text/plain' } });
+        // The response from Gemini with alt=sse is already a stream. We can pipe it directly.
+        return new Response(apiResponse.body, { headers: { 'Content-Type': 'text/event-stream' } });
 
     } catch (error) {
         console.error('Error calling Gemini API:', error);

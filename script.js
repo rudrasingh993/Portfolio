@@ -151,12 +151,9 @@ function initProjectModals() {
     if (!modal || !overlay || !closeBtn) return;
 
     projectCards.forEach(card => {
-        const viewDetailsBtn = card.querySelector('.project-action-btn');
-        if (viewDetailsBtn) {
-            viewDetailsBtn.addEventListener('click', () => {
-                populateAndShowModal(card);
-            });
-        }
+        card.addEventListener('click', () => {
+            populateAndShowModal(card);
+        });
     });
 
     function populateAndShowModal(card) {
@@ -925,7 +922,7 @@ function initChatbot() {
                 appendMessage(workerResponse.response, 'bot-message');
                 showSuggestions(workerResponse.suggestions);
             } else if (workerResponse.type === 'stream') {
-                // Handle streaming AI response
+                // Handle streaming AI response by calling our secure API endpoint
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -951,22 +948,31 @@ function initChatbot() {
                     const { done, value } = await reader.read();
                     if (done) break;
 
-                    let chunk = decoder.decode(value, { stream: true });
+                    const chunk = decoder.decode(value, { stream: true });
+                    const jsonChunks = chunk.replace(/^data: /gm, '').split('\n').filter(s => s.trim());
 
-                    if (suggestionsFound) {
-                        suggestionsText += chunk;
-                    } else if (chunk.includes('[SUGGESTIONS]')) {
-                        suggestionsFound = true;
-                        const parts = chunk.split('[SUGGESTIONS]');
-                        chunk = parts[0];
-                        suggestionsText = parts[1] || '';
-                    }
+                    for (const jsonChunk of jsonChunks) {
+                        try {
+                            const parsed = JSON.parse(jsonChunk);
+                            let textChunk = parsed.candidates[0].content.parts[0].text;
 
-                    if (!suggestionsFound) {
-                        fullResponseText += chunk;
-                        // This is where we parse and render the streaming text
-                        renderMessageContent(botMessageElement, fullResponseText);
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                            if (suggestionsFound) {
+                                suggestionsText += textChunk;
+                            } else if (textChunk.includes('[SUGGESTIONS]')) {
+                                suggestionsFound = true;
+                                const parts = textChunk.split('[SUGGESTIONS]');
+                                textChunk = parts[0];
+                                suggestionsText = parts[1] || '';
+                            }
+
+                            if (!suggestionsFound) {
+                                fullResponseText += textChunk;
+                                renderMessageContent(botMessageElement, fullResponseText);
+                                chatMessages.scrollTop = chatMessages.scrollHeight;
+                            }
+                        } catch (e) {
+                            // Ignore parsing errors for incomplete chunks
+                        }
                     }
                 }
 
