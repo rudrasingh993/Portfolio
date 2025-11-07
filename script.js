@@ -903,7 +903,6 @@ function initChatbot() {
         if (existingSuggestions) existingSuggestions.remove();
 
         // Disable input while processing
-
         chatInput.disabled = true;
         chatSend.disabled = true;
 
@@ -920,13 +919,20 @@ function initChatbot() {
                 // Handle instant local response
                 loadingMessage.remove();
                 appendMessage(workerResponse.response, 'bot-message');
-                showSuggestions(workerResponse.suggestions);
+                if (workerResponse.suggestions) {
+                    showSuggestions(workerResponse.suggestions);
+                }
             } else if (workerResponse.type === 'stream') {
                 // Handle streaming AI response by calling our secure API endpoint
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userInput, chatHistory, knowledgeBase }),
+                    body: JSON.stringify({ 
+                        userInput, 
+                        chatHistory, 
+                        knowledgeBase,
+                        suggestions: workerResponse.suggestions 
+                    }),
                 });
 
                 if (!response.ok) {
