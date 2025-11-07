@@ -113,7 +113,7 @@ Bot: "Why did the developer go broke? Because he used up all his cache! 😂"
 
 **Your Task:**
 1.  Provide a helpful and engaging response to the user's question.
-2.  After your response, on a new line, add a special marker `[SUGGESTIONS]`.
+2.  After your response, on a new line, add a special marker [SUGGESTIONS].
 3.  After the marker, provide exactly three short, relevant follow-up questions that the user might ask next. Separate them with a pipe character (|). Do not add a newline after the suggestions.
 
 **Example Output Format:**
