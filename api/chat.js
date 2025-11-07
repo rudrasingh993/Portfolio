@@ -91,7 +91,7 @@ Bot: "Why did the developer go broke? Because he used up all his cache! 😂"
 
 **Example Output Format:**
 That's a great question! Rudra is skilled in Python, JavaScript, and Java. He's particularly passionate about building AI-driven applications with Python. 🐍
-\[SUGGESTIONS]What are his favorite projects?|Is he available for freelance work?|Tell me more about his backend skills.
+\\[SUGGESTIONS]What are his favorite projects?|Is he available for freelance work?|Tell me more about his backend skills.
 
 Your answer:`;
 
