@@ -14,7 +14,6 @@ fs.writeFileSync(sitemapPath, sitemap);
 console.log(`✅ Updated <lastmod> to ${today} in sitemap.xml`);
 
 // --- Submit URLs to IndexNow ---
-import https from "https";
 import { parseStringPromise } from "xml2js";
 
 const SITEMAP_PATH = "./sitemap.xml";
@@ -37,52 +36,43 @@ async function submitToIndexNow(urls) {
     urlList: urls
   });
 
-  const options = {
-    hostname: "www.bing.com",
-    path: "/indexnow",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Content-Length": Buffer.byteLength(payload)
-    }
-  };
-
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, res => {
-      let data = "";
-      res.on("data", chunk => { data += chunk; });
-      res.on("end", () => {
-        console.log(`HTTP Response Code: ${res.statusCode}`);
-        switch (res.statusCode) {
-          case 200:
-            console.log("✅ Ok - URL(s) submitted successfully");
-            break;
-          case 400:
-            console.error("❌ Bad request - Invalid format");
-            break;
-          case 403:
-            console.error("❌ Forbidden - Key not valid or not found");
-            break;
-          case 422:
-            console.error("❌ Unprocessable Entity - URLs don’t belong to host or key mismatch");
-            break;
-          case 429:
-            console.error("❌ Too Many Requests - Potential spam");
-            break;
-          default:
-            console.error(`❌ Unexpected response: ${res.statusCode}`);
-        }
-        if (res.statusCode === 200) {
-          resolve(data);
-        } else {
-          reject(data);
-        }
-      });
+  try {
+    const response = await fetch("https://www.bing.com/indexnow", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: payload,
     });
-    req.on("error", reject);
-    req.write(payload);
-    req.end();
-  });
+
+    console.log(`HTTP Response Code: ${response.status}`);
+    switch (response.status) {
+      case 200:
+        console.log("✅ Ok - URL(s) submitted successfully");
+        break;
+      case 400:
+        console.error("❌ Bad request - Invalid format");
+        break;
+      case 403:
+        console.error("❌ Forbidden - Key not valid or not found");
+        break;
+      case 422:
+        console.error("❌ Unprocessable Entity - URLs don’t belong to host or key mismatch");
+        break;
+      case 429:
+        console.error("❌ Too Many Requests - Potential spam");
+        break;
+      default:
+        console.error(`❌ Unexpected response: ${response.status}`);
+    }
+
+    if (!response.ok) {
+      throw new Error(`API call failed with status ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Error submitting to IndexNow:", error.message);
+    throw error; // Re-throw to be caught by the main try/catch block
+  }
 }
 
 (async () => {
