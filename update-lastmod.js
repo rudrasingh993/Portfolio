@@ -20,7 +20,7 @@ import { parseStringPromise } from "xml2js";
 const SITEMAP_PATH = "./sitemap.xml";
 const KEY = "7f752836d8e441049bbee2d2b482c3db";
 const HOST = "www.rudrasingh.dev"; // Change to your actual domain
-const KEY_LOCATION = `https://${HOST}/${KEY}.txt`;
+const KEY_LOCATION = `https://www.rudrasingh.dev/7f752836d8e441049bbee2d2b482c3db.txt`;
 
 async function getUrlsFromSitemap() {
   const xml = fs.readFileSync(SITEMAP_PATH, "utf8");
