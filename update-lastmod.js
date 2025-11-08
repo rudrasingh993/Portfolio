@@ -52,11 +52,29 @@ async function submitToIndexNow(urls) {
       let data = "";
       res.on("data", chunk => { data += chunk; });
       res.on("end", () => {
+        console.log(`HTTP Response Code: ${res.statusCode}`);
+        switch (res.statusCode) {
+          case 200:
+            console.log("✅ Ok - URL(s) submitted successfully");
+            break;
+          case 400:
+            console.error("❌ Bad request - Invalid format");
+            break;
+          case 403:
+            console.error("❌ Forbidden - Key not valid or not found");
+            break;
+          case 422:
+            console.error("❌ Unprocessable Entity - URLs don’t belong to host or key mismatch");
+            break;
+          case 429:
+            console.error("❌ Too Many Requests - Potential spam");
+            break;
+          default:
+            console.error(`❌ Unexpected response: ${res.statusCode}`);
+        }
         if (res.statusCode === 200) {
-          console.log("IndexNow submission successful");
           resolve(data);
         } else {
-          console.error("IndexNow submission failed:", res.statusCode, data);
           reject(data);
         }
       });
