@@ -46,6 +46,9 @@
 <body>
 
 <main>
+  <iframe id="music" title="Apple Music Player" frameborder="0" height="170" loading="eager"
+  fetchpriority="high" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="about:blank" allow="autoplay; encrypted-media"></iframe>
+
   <section class="main_home">
     <div class="container">
       <div class="row">
@@ -53,11 +56,11 @@
           <div class="main_home-center text-center">
             <div class="four_zero_four_bg">
               <h1 class="text-center">404</h1>
+              
             </div>
             <div class="main_home_box">
               <h2 class="h2">Looks like you're lost</h2>
               <p>The page you are looking for is not available! Let's get you back home.</p>
-              <a href="https://www.rudrasingh.dev/" class="link_404">Go to Homepage</a>
             </div>
           </div>
         </div>
@@ -67,25 +70,20 @@
 </main>
 
 
-<iframe id="music" title="Apple Music Player" frameborder="0" height="170" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/in/album/tu-hi-mera/514419701?i=514419703" allow="autoplay; encrypted-media"></iframe>
 
 <button id="nextButton" aria-label="Go to YouTube video for more information">
   👓👀🧷
 </button>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("music").src = "https://embed.music.apple.com/in/album/tu-hi-mera/514419701?i=514419703";
+});
+</script>
+
+<script>
 document.getElementById("nextButton").addEventListener("click",function(){window.location.href="https://www.youtube.com/watch?v=pGar-UN2cfc"});
 </script>
 
-<script>
-  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-</script>
-<script defer src="/_vercel/insights/script.js"></script>
-<script>
-  window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
-</script>
-<script defer src="/_vercel/speed-insights/script.js"></script>
-
 </body>
 </html>
-
