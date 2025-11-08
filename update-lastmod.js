@@ -38,7 +38,7 @@ async function submitToIndexNow(urls) {
   });
 
   const options = {
-    hostname: "api.indexnow.org",
+    hostname: "www.bing.com",
     path: "/indexnow",
     method: "POST",
     headers: {
