@@ -41,7 +41,7 @@ const knowledgeBase = {
   "roadmap": "Interested in AI/ML and Data Science — focus on math, Python, ML libraries, project-based portfolio, internships, and building demonstrable systems.",
 
   // Devices / hardware / audio
-  "devices": "Primary phone: Realme Narzo 60 Pro. Also owns Samsung Galaxy J7 Prime (SM-G610F/DD, rooted). Audio gear: Sony WH-1000XM5 and Audio-Technica M50xBT2.",
+  "devices": "Primary phone: Realme Narzo 60 Pro. Have a Hp pavilion x360 touch i5 11gen 8Gb ram and 512 SSD.Audio gear: Sony WH-1000XM5 and Audio-Technica M50xBT2.",
   "headphones": "Rudra prefers high-quality sound with deep bass; owns Sony WH-1000XM5 and Audio-Technica M50xBT2.",
 
   // Personal & preferences
