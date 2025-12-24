@@ -1,0 +1,171 @@
+/* Chatbot Page Styles */
+
+/* General Layout Adjustments */
+body {
+    /* Use flex column to stack content, but since navbar is fixed, we need padding */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--bg-primary);
+    transition: background-color 0.3s ease;
+    /* Push content down to account for fixed navbar height */
+    padding-top: 80px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Navbar overrides */
+.navbar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 3000 !important;
+    background: var(--bg-primary);
+}
+
+/* Chatbot Container */
+.chatbot-container {
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.page-content {
+    text-align: center;
+    padding: 2rem;
+}
+
+.chat-trigger-btn {
+    margin-top: 1rem;
+}
+
+/* Theme toggle positioning - Hidden in body as it's in navbar now */
+.theme-toggle-container {
+    display: none;
+}
+
+/* --- Mobile Styles --- */
+@media (max-width: 768px) {
+    body {
+        padding-top: 60px;
+    }
+
+    .page-content h1 {
+        font-size: 2rem;
+        margin-top: 2rem;
+    }
+
+    .page-content p {
+        font-size: 0.9rem;
+        padding: 0 1rem;
+    }
+
+    .chatbot-container {
+        height: auto;
+        padding: 0;
+        display: block;
+    }
+
+    /* Full Screen Popup Chat */
+    .chat-window {
+        display: none;
+        flex-direction: column;
+        position: fixed !important;
+        top: 60px !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: calc(100% - 60px) !important;
+        max-width: none !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        background: var(--bg-primary);
+        z-index: 2000 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+    }
+
+    .chat-window.active {
+        display: flex !important;
+    }
+
+    .chat-messages {
+        flex-grow: 1;
+        height: auto;
+        overflow-y: auto;
+    }
+
+    .chat-header {
+        border-radius: 0 !important;
+        padding: 15px;
+        background: var(--bg-secondary);
+    }
+
+    .chat-icon {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    /* Mobile Menu Overlay */
+    .navbar .nav-links.active {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100vh !important;
+        background-color: var(--bg-primary) !important;
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 4000 !important;
+    }
+}
+
+/* --- Desktop Styles --- */
+@media (min-width: 769px) {
+    .chat-trigger-btn,
+    .chat-icon,
+    .page-content > h1,
+    .page-content > p {
+        display: none !important;
+    }
+
+    .chatbot-container {
+        height: calc(100vh - 80px);
+        padding-bottom: 20px;
+    }
+
+    .chat-window {
+        position: relative !important;
+        bottom: auto !important;
+        right: auto !important;
+        top: auto !important;
+        width: 90% !important;
+        max-width: 1000px !important;
+        height: 100% !important;
+        max-height: 900px !important;
+        border-radius: 12px !important;
+        display: flex !important;
+        flex-direction: column;
+        box-shadow: var(--shadow-large) !important;
+        opacity: 1 !important;
+        transform: none !important;
+        pointer-events: auto !important;
+        overflow: hidden;
+    }
+
+    #chatClose {
+        display: none !important;
+    }
+
+    .chat-messages {
+        flex-grow: 1;
+        height: auto;
+    }
+}
